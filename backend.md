@@ -1,5 +1,3 @@
-Okay, here is a backend implementation guide for your MVP fitness/inventory/recipe application, designed for a Backend Engineer.
-
 # Backend Implementation Guide: Fitness Inventory & Recipe App MVP
 
 **Version:** 1.0
@@ -881,5 +879,3 @@ async def generate_recipe(
     }
 
 ```
-
-This guide provides a solid foundation for implementing the backend MVP. Remember to replace placeholder database interactions (`MockDB`, `get_db_session`) with actual SQLAlchemy ORM code connecting to your PostgreSQL database, and fill in the details for the image processing pipeline (`process_image_for_inventory`) and the Hugging Face model interactions (`call_text2text_model`).
