@@ -1,4 +1,4 @@
-```markdown
+
 # Frontend Implementation Guide: Fitness & Inventory Tracker MVP
 
 **Version:** 1.0
@@ -560,4 +560,4 @@ export const fetchWeeklyReports = () => request('/reports/weekly-nutrient-trend'
 ```
 
 This guide provides a foundational structure and practical examples for building the frontend of the Fitness & Inventory Tracker MVP using React. Remember to handle loading states, errors, and user feedback consistently across the application.
-```
+
