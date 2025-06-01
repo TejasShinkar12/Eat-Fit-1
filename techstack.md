@@ -1,4 +1,3 @@
-```markdown
 # Technology Stack Recommendation: Smart Pantry & Fitness Tracker (MVP)
 
 **Version: 1.0**
@@ -76,4 +75,3 @@ Key components:
     *   **Justification:** Necessary for user signup verification, password resets, and potential expiry alerts. Use a dedicated transactional email service for deliverability and ease of integration.
 
 This stack provides a solid foundation for building the described MVP features, balancing development speed, maintainability, and the specific requirements of integrating ML models and image processing.
-```
