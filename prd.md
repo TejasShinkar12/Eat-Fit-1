@@ -1,4 +1,3 @@
-```markdown
 # Product Requirements Document: PantryFit MVP
 
 **Version:** 1.0
@@ -340,4 +339,3 @@ This roadmap outlines a possible sequence for implementing the MVP features, pri
 *   Advanced Features: Barcode scanning, meal planning, shopping list generation, community features, integration with wearables, refined ML models.
 
 ---
-```
