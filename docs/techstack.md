@@ -1,14 +1,14 @@
 # Technology Stack Recommendation: Smart Pantry & Fitness Tracker (MVP)
 
-**Version: 1.0**
+**Version: 1.1**
 **Date: May 25, 2025**
 
 ## Technology Summary
 
-This document outlines a recommended technology stack for the Minimum Viable Product (MVP) of the Smart Pantry & Fitness Tracker application. The architecture follows a standard three-tier pattern: a React-based frontend, a Python/FastAPI backend serving as the API and business logic layer, and a PostgreSQL database for persistent storage. Image processing (Object Detection, OCR) and Machine Learning (Recipe Generation, Q&A) will be integrated into the backend using the Hugging Face ecosystem. Asynchronous processing via Celery and Redis will handle time-consuming tasks like image ingestion. Deployment will leverage containerization for portability.
+This document outlines a recommended technology stack for the Minimum Viable Product (MVP) of the Smart Pantry & Fitness Tracker application. The architecture follows a standard three-tier pattern: a React Native-based mobile frontend, a Python/FastAPI backend serving as the API and business logic layer, and a PostgreSQL database for persistent storage. Image processing (Object Detection, OCR) and Machine Learning (Recipe Generation, Q&A) will be integrated into the backend using the Hugging Face ecosystem. Asynchronous processing via Celery and Redis will handle time-consuming tasks like image ingestion. Deployment will leverage containerization for portability.
 
 Key components:
-*   **Frontend:** React for a dynamic, component-based web UI.
+*   **Frontend:** React Native for a cross-platform mobile application.
 *   **Backend:** Python with FastAPI for a high-performance, asynchronous API, integrating ML models and database interaction.
 *   **Database:** PostgreSQL for reliable and structured storage of user data, inventory, and logs.
 *   **Asynchronous Processing:** Celery and Redis for handling the image processing pipeline.
@@ -17,12 +17,12 @@ Key components:
 
 ## Frontend Recommendations
 
-*   **Framework:** **React**
-    *   **Justification:** Explicitly requested, highly popular, component-based architecture facilitates modular development, large community and ecosystem. Suitable for building interactive single-page applications. React Native would be the natural progression if mobile-first becomes a requirement.
+*   **Framework:** **React Native**
+    *   **Justification:** Cross-platform mobile development with native performance. Share code between iOS and Android while maintaining platform-specific look and feel. Large community and ecosystem. Expo framework can be used to speed up development.
 *   **State Management:** **React Query** + **Context API / Zustand**
     *   **Justification:** React Query is ideal for managing asynchronous server state (fetching inventory, profile, reports, etc.), handling caching, background updates, and error handling efficiently. For local UI state or simpler global states not involving server data (e.g., modal visibility), React's built-in `useState` and `useContext` are sufficient. For more complex global application state that isn't server-derived, lightweight libraries like Zustand offer a simpler alternative to Redux for MVP.
-*   **UI Library:** **Material UI (MUI)** or **Chakra UI**
-    *   **Justification:** Accelerates UI development with pre-built, accessible, and themeable components. Both provide comprehensive sets covering forms, data display (tables, cards), navigation, and data visualization components (basic charts). MUI is very widely adopted; Chakra UI is developer-friendly and focuses on accessibility. Choose one based on team preference and desired aesthetic.
+*   **UI Library:** **React Native Paper** or **Native Base**
+    *   **Justification:** Provides pre-built, platform-adaptive components following Material Design guidelines. Both offer comprehensive sets of components optimized for mobile, including forms, data display, navigation, and data visualization components. React Native Paper is more lightweight, while Native Base offers more customization.
 
 ## Backend Recommendations
 

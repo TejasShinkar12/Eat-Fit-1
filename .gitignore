@@ -39,7 +39,9 @@ yarn-error.log*
 .env.local
 .env.development.local
 .env.test.local
-.env.production.local
+.env.production.local\
+.gitignore
+.cursorrules
 
 # Python
 *.py[cod]

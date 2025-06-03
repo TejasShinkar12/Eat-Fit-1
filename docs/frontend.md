@@ -1,10 +1,9 @@
-
 # Frontend Implementation Guide: Fitness & Inventory Tracker MVP
 
-**Version:** 1.0
+**Version:** 1.1
 **Date:** May 25, 2024
 
-This document outlines the frontend implementation strategy for the Fitness & Inventory Tracker Minimum Viable Product (MVP). The guide focuses on using React for a web-based application, covering core architecture, state management, UI considerations, API integration, testing, and providing practical code examples.
+This document outlines the frontend implementation strategy for the Fitness & Inventory Tracker Minimum Viable Product (MVP). The guide focuses on using React Native for a mobile-first application, covering core architecture, state management, UI considerations, API integration, testing, and providing practical code examples.
 
 ## 1. Component Architecture
 
@@ -12,30 +11,31 @@ The application will follow a component-based architecture, breaking down the UI
 
 **Core Structure:**
 
-*   **`App.js`**: The root component. Sets up the context providers and routing.
-*   **`Router.js`**: Handles navigation between different pages/screens using a library like `react-router-dom`.
-*   **`Layout.js`**: Provides a consistent structural wrapper for main pages (e.g., including a header, navigation, and footer).
-*   **Pages/Screens**: Components representing full views for different routes.
-    *   `LoginPage.js`
-    *   `SignupPage.js`
-    *   `ProfileSetupPage.js`
-    *   `DashboardPage.js`
-    *   `InventoryPage.js`
-    *   `InventoryItemPage.js` (for viewing/editing a single item)
-    *   `ImageUploadPage.js`
-    *   `RecipesPage.js`
-    *   `ReportsPage.js`
-*   **Reusable Components**: Smaller UI elements used across pages.
-    *   `AuthForm.js` (used by Login/Signup)
-    *   `UserProfileForm.js`
-    *   `InventoryList.js`
-    *   `InventoryItemCard.js` (displays single item info)
-    *   `ImageUploadForm.js`
-    *   `RecipeCard.js`
-    *   `ChartComponent.js` (for reports)
-    *   `AlertDisplay.js`
-    *   `LoadingSpinner.js`
-    *   `ErrorMessage.js`
+*   **`App.tsx`**: The root component. Sets up the context providers and navigation.
+*   **`navigation/`**: Contains navigation configuration using `@react-navigation/native`.
+    *   `AppNavigator.tsx`: Main navigation setup with tab and stack navigators
+    *   `AuthNavigator.tsx`: Authentication flow navigation
+*   **Screens**: Components representing full views for different routes.
+    *   `LoginScreen.tsx`
+    *   `SignupScreen.tsx`
+    *   `ProfileSetupScreen.tsx`
+    *   `DashboardScreen.tsx`
+    *   `InventoryScreen.tsx`
+    *   `InventoryItemScreen.tsx` (for viewing/editing a single item)
+    *   `ImageUploadScreen.tsx`
+    *   `RecipesScreen.tsx`
+    *   `ReportsScreen.tsx`
+*   **Reusable Components**: Smaller UI elements used across screens.
+    *   `AuthForm.tsx` (used by Login/Signup)
+    *   `UserProfileForm.tsx`
+    *   `InventoryList.tsx`
+    *   `InventoryItemCard.tsx` (displays single item info)
+    *   `ImageUploadForm.tsx`
+    *   `RecipeCard.tsx`
+    *   `ChartComponent.tsx` (for reports)
+    *   `AlertDisplay.tsx`
+    *   `LoadingSpinner.tsx`
+    *   `ErrorMessage.tsx`
     *   Form inputs (reusable `Input`, `Select`, etc.)
     *   Buttons (reusable `Button`)
 
@@ -53,41 +53,41 @@ graph TD
     App --> AuthContext
     App --> InventoryContext
     App --> ConsumptionContext
-    Router --> LoginPage
-    Router --> SignupPage
-    Router --> ProfileSetupPage
-    Router --> DashboardPage
-    Router --> InventoryPage
-    Router --> InventoryItemPage
-    Router --> ImageUploadPage
-    Router --> RecipesPage
-    Router --> ReportsPage
+    Router --> LoginScreen
+    Router --> SignupScreen
+    Router --> ProfileSetupScreen
+    Router --> DashboardScreen
+    Router --> InventoryScreen
+    Router --> InventoryItemScreen
+    Router --> ImageUploadScreen
+    Router --> RecipesScreen
+    Router --> ReportsScreen
 
-    LoginPage --> AuthForm
-    SignupPage --> AuthForm
-    ProfileSetupPage --> UserProfileForm
-    DashboardPage --> LoadingSpinner
-    DashboardPage --> ErrorMessage
-    DashboardPage --> ChartComponent
-    DashboardPage --> AlertDisplay
-    DashboardPage --> InventoryList(Consumption Log Snippet?)
-    InventoryPage --> InventoryList
-    InventoryPage --> ImageUploadForm
+    LoginScreen --> AuthForm
+    SignupScreen --> AuthForm
+    ProfileSetupScreen --> UserProfileForm
+    DashboardScreen --> LoadingSpinner
+    DashboardScreen --> ErrorMessage
+    DashboardScreen --> ChartComponent
+    DashboardScreen --> AlertDisplay
+    DashboardScreen --> InventoryList(Consumption Log Snippet?)
+    InventoryScreen --> InventoryList
+    InventoryScreen --> ImageUploadForm
     InventoryList --> InventoryItemCard
     InventoryItemCard --> Button(Edit/Delete/Consume)
-    InventoryItemPage --> InventoryItemCard(Detailed View/Edit)
-    ImageUploadPage --> ImageUploadForm
-    RecipesPage --> RecipeCard
-    ReportsPage --> ChartComponent
-    ReportsPage --> AlertDisplay
+    InventoryItemScreen --> InventoryItemCard(Detailed View/Edit)
+    ImageUploadScreen --> ImageUploadForm
+    RecipesScreen --> RecipeCard
+    ReportsScreen --> ChartComponent
+    ReportsScreen --> AlertDisplay
 
-    AuthContext --> LoginPage
-    AuthContext --> SignupPage
-    AuthContext --> DashboardPage(Check Auth)
-    InventoryContext --> InventoryPage
-    InventoryContext --> DashboardPage(Inventory Snippet)
-    ConsumptionContext --> DashboardPage(Calories/Macros)
-    ConsumptionContext --> ReportsPage
+    AuthContext --> LoginScreen
+    AuthContext --> SignupScreen
+    AuthContext --> DashboardScreen(Check Auth)
+    InventoryContext --> InventoryScreen
+    InventoryContext --> DashboardScreen(Inventory Snippet)
+    ConsumptionContext --> DashboardScreen(Calories/Macros)
+    ConsumptionContext --> ReportsScreen
 
     UserProfileForm --> Button(Save)
     AuthForm --> Button(Submit)
@@ -107,9 +107,9 @@ For the MVP, a combination of React's `useState` for local component state and `
 *   **Consumption Tracking:**
     *   `ConsumptionContext` (or integrated into Inventory/Dashboard context): Stores daily consumption summary (`{ totalCalories, protein, carbs, fat }`) and potentially a log of recent consumptions. Provides a function to `fetchDailySummary`.
 *   **Recipes:**
-    *   Managed locally within the `RecipesPage` or a dedicated `RecipeContext` if recipes need to be shared or cached globally. Stores the list of generated recipes.
+    *   Managed locally within the `RecipesScreen` or a dedicated `RecipeContext` if recipes need to be shared or cached globally. Stores the list of generated recipes.
 *   **Reports:**
-    *   Managed locally within the `ReportsPage`. Fetches and stores data for specific reports (e.g., weekly nutrient trends).
+    *   Managed locally within the `ReportsScreen`. Fetches and stores data for specific reports (e.g., weekly nutrient trends).
 *   **UI State:**
     *   `useState` in components for form inputs, loading indicators (`isLoading`), error messages (`error`), modal visibility, etc.
 
@@ -126,66 +126,53 @@ For the MVP, a combination of React's `useState` for local component state and `
 
 ## 3. UI Design
 
-The UI should be clean, intuitive, and functional, prioritizing the core user flows:
+The UI should be clean, intuitive, and functional, prioritizing the core user flows and following React Native and platform-specific (iOS/Android) design guidelines:
 
-*   **Authentication:** Simple forms for email/password login and signup. Clear validation messages.
-*   **Profile Setup:** A straightforward form with fields for height, weight, age, sex, activity level, and fitness goal. Radio buttons or dropdowns for sex, activity level, and goal.
-*   **Dashboard:** A clear overview.
-    *   Prominent display of Calories Consumed vs. Target. Use a progress bar or circular chart.
-    *   Simple breakdown of Protein, Carbs, and Fat (e.g., using text or a pie chart).
-    *   A recent Inventory Depletion Log (maybe a small list).
-    *   Quick links or buttons to Inventory, Upload, Recipes, Reports.
+*   **Authentication:** Native-looking forms for email/password login and signup. Clear validation messages.
+*   **Profile Setup:** A straightforward form with fields for height, weight, age, sex, activity level, and fitness goal. Native pickers for sex, activity level, and goal.
+*   **Dashboard:** A clear overview optimized for mobile screens.
+    *   Prominent display of Calories Consumed vs. Target. Use React Native compatible charts (e.g., react-native-svg-charts).
+    *   Simple breakdown of Protein, Carbs, and Fat using mobile-optimized visualizations.
+    *   A recent Inventory Depletion Log as a scrollable list.
+    *   Bottom tab navigation for quick access to Inventory, Upload, Recipes, Reports.
 *   **Inventory View:**
-    *   A list or grid of items. Each item card shows name, maybe quantity, and key nutrition info (calories per serving).
-    *   Clear "Add Item" button.
-    *   Buttons or icons on each item card for "Edit", "Delete", and "Consume".
-    *   Search/Filter functionality can be added later if needed.
-*   **Inventory Item Edit/Add:** A form pre-filled with existing data for edits, or empty for new items. Fields for name, quantity, calories/serving, expiry date (date picker).
-*   **Image Upload:** A clear drag-and-drop area or button to select an image file. Display a loading state while processing. Show results (detected items) for confirmation or editing before saving to inventory.
+    *   A FlatList of items. Each item card shows name, quantity, and key nutrition info.
+    *   Floating Action Button (FAB) for adding items.
+    *   Swipe actions on items for Edit, Delete, and Consume.
+    *   Pull-to-refresh functionality.
+*   **Inventory Item Edit/Add:** Modal or full-screen form with native input components.
+*   **Image Upload:** 
+    *   Access to device camera and photo library.
+    *   Camera preview for taking photos.
+    *   Loading state while processing.
+    *   Results preview before saving to inventory.
 *   **Recipe Generator:**
-    *   Potentially show the list of ingredients being used based on current inventory.
-    *   Display generated recipes clearly (Recipe Name, Ingredients List, Instructions). Simple text format is fine for MVP.
+    *   Mobile-optimized layout for ingredients and instructions.
+    *   Share button for recipes.
 *   **Reports & Alerts:**
-    *   Dedicated page or section.
-    *   Charts (e.g., using a library like Chart.js or Nivo) for weekly nutrient trends.
-    *   A list for "Top Contributors".
-    *   A dedicated section or dismissible notifications for alerts (Expiry warnings, Calorie goal warnings).
+    *   Mobile-optimized charts using React Native compatible libraries.
+    *   Native notifications for alerts.
 *   **General:**
-    *   Consistent header/navigation.
-    *   Loading states and error messages should be clearly visible.
-    *   Responsive design is recommended if targeting both desktop and mobile browsers.
+    *   Native navigation patterns (tabs, stacks, modals).
+    *   Platform-specific loading indicators.
+    *   Proper keyboard handling.
+    *   Responsive to different screen sizes.
+    *   Support for both light and dark modes.
 
 ## 4. API Integration
 
 The frontend will communicate with the FastAPI backend using RESTful API calls.
 
-*   **HTTP Client:** Use the browser's native `fetch` API or a library like `axios`. `axios` provides features like interceptors and automatic JSON transformation which can be helpful.
-*   **Base URL:** Configure a base URL for the backend API (e.g., `http://localhost:8000/api/v1`).
+*   **HTTP Client:** Use `axios` for API calls. Consider using `react-query` for managing server state.
+*   **Base URL:** Configure a base URL for the backend API that works for both development and production.
 *   **Authentication:**
-    *   Upon successful login/signup, the backend should return a token (e.g., JWT).
-    *   Store this token securely on the client-side (e.g., using `localStorage` or `sessionStorage`).
-    *   Include this token in the `Authorization: Bearer <token>` header for all subsequent authenticated requests.
-    *   Implement request interceptors (if using axios) or wrap `fetch` calls to automatically add this header.
-    *   Handle 401 (Unauthorized) responses by redirecting the user to the login page and clearing the stored token.
-*   **Request/Response Handling:**
-    *   Use `async/await` syntax for making API calls.
-    *   Wrap API calls in `try...catch` blocks to handle errors (network issues, server errors).
-    *   Update component or context state based on API responses (e.g., set `isLoading` to true before call, false after; set `error` state if catch block is hit; update data state on success).
-    *   Parse JSON responses (`response.json()` with `fetch` or `response.data` with `axios`).
-*   **Specific Endpoint Mappings (Examples):**
-    *   Login: `POST /auth/login` -> `{ email, password }` -> `{ access_token }`
-    *   Signup: `POST /auth/signup` -> `{ email, password }` -> `{ access_token }`
-    *   Get Profile: `GET /users/me` (requires auth header) -> `{ id, email, height, weight, ... }`
-    *   Update Profile: `PUT /users/me` (requires auth header) -> `{ height, weight, ... }` -> `{ id, email, ... }`
-    *   Upload Image: `POST /inventory/upload-image` (requires auth header, `multipart/form-data` body with image file) -> `{ processed_items: [...] }` (list of detected items with data)
-    *   Get Inventory: `GET /inventory` (requires auth header) -> `[{ id, name, quantity, ... }, ...]`
-    *   Add Manual Item: `POST /inventory` (requires auth header, `{ name, quantity, ... }`) -> `{ id, name, quantity, ... }`
-    *   Update Item: `PUT /inventory/{id}` (requires auth header, `{ name?, quantity?, ... }`) -> `{ id, name, quantity, ... }`
-    *   Delete Item: `DELETE /inventory/{id}` (requires auth header) -> `{ message: "..." }`
-    *   Mark Consumed: `POST /consumption` (requires auth header, `{ item_id, quantity }`) -> `{ message: "...", daily_summary: { ... } }` (or separate call to get summary)
-    *   Get Daily Summary: `GET /consumption/daily` (requires auth header) -> `{ totalCalories, protein, carbs, fat, depletion_log: [...] }`
-    *   Get Recipes: `GET /recipes` (requires auth header) -> `[{ name, ingredients, instructions }, ...]`
-    *   Get Reports: `GET /reports/weekly-nutrient-trend`, `GET /reports/top-contributors` (requires auth header) -> `{ data: [...] }`
+    *   Upon successful login/signup, store the JWT token securely using `@react-native-async-storage/async-storage`.
+    *   Include token in the `Authorization: Bearer <token>` header for authenticated requests.
+    *   Handle 401 responses by navigating to the login screen and clearing stored token.
+*   **Image Upload:**
+    *   Use `react-native-image-picker` or `expo-image-picker` for accessing camera and photo library.
+    *   Handle image resizing and compression before upload.
+    *   Show upload progress using native indicators.
 
 ## 5. Testing Approach
 
@@ -223,7 +210,7 @@ Here are sample code snippets illustrating key frontend concepts for this projec
 **Example 1: Basic Auth Form Component**
 
 ```javascript
-// src/components/AuthForm.js
+// src/components/AuthForm.tsx
 import React, { useState } from 'react';
 
 function AuthForm({ type, onSubmit, isLoading, error }) {
@@ -274,9 +261,9 @@ export default AuthForm;
 **Example 2: Auth Context for Global State**
 
 ```javascript
-// src/contexts/AuthContext.js
+// src/contexts/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { loginUser, signupUser, fetchUserProfile } from '../api'; // Assume api.js exists
+import { loginUser, signupUser, fetchUserProfile } from '../api'; // Assume api.ts exists
 
 const AuthContext = createContext(null);
 
@@ -367,7 +354,7 @@ export const useAuth = () => useContext(AuthContext);
 **Example 3: Fetching and Displaying Inventory List**
 
 ```javascript
-// src/pages/InventoryPage.js
+// src/pages/InventoryScreen.tsx
 import React, { useEffect, useState } from 'react';
 import InventoryList from '../components/InventoryList';
 import ImageUploadForm from '../components/ImageUploadForm';
@@ -375,7 +362,7 @@ import { useInventory } from '../contexts/InventoryContext'; // Assume Inventory
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 
-function InventoryPage() {
+function InventoryScreen() {
   const { inventory, fetchInventory, loading, error } = useInventory();
   const [uploadError, setUploadError] = useState(null);
 
@@ -424,9 +411,9 @@ function InventoryPage() {
   );
 }
 
-export default InventoryPage;
+export default InventoryScreen;
 
-// src/components/InventoryList.js
+// src/components/InventoryList.tsx
 import React from 'react';
 import InventoryItemCard from './InventoryItemCard'; // Assume this component exists
 
@@ -452,7 +439,7 @@ function InventoryList({ items }) {
 
 export default InventoryList;
 
-// src/components/InventoryItemCard.js (Simplified)
+// src/components/InventoryItemCard.tsx (Simplified)
 import React from 'react';
 
 function InventoryItemCard({ item, onConsume, onDelete, onEdit }) {
@@ -470,13 +457,13 @@ function InventoryItemCard({ item, onConsume, onDelete, onEdit }) {
 }
 
 // Note: Full InventoryContext and API calls for delete/consume would be needed
-// in the actual implementation following the patterns in AuthContext.js and api.js
+// in the actual implementation following the patterns in AuthContext.tsx and api.ts
 ```
 
 **Example 4: API Helper Function (using fetch)**
 
 ```javascript
-// src/api.js
+// src/api.ts
 const API_BASE_URL = 'http://localhost:8000/api/v1'; // Configure based on your backend
 
 async function request(endpoint, options = {}) {
@@ -559,5 +546,5 @@ export const fetchWeeklyReports = () => request('/reports/weekly-nutrient-trend'
 // Add more API functions as needed...
 ```
 
-This guide provides a foundational structure and practical examples for building the frontend of the Fitness & Inventory Tracker MVP using React. Remember to handle loading states, errors, and user feedback consistently across the application.
+This guide provides a foundational structure and practical examples for building the frontend of the Fitness & Inventory Tracker MVP using React Native. Remember to handle loading states, errors, and user feedback consistently across the application.
 
