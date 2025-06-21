@@ -61,11 +61,11 @@ def test_jwt_masking():
     config = PIIMaskingConfig()
     test_cases = [
         # Standard JWT
-        ("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8",
-         "***w5N_XgL0"),
+        ("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+         "***sw5c"),
         # Bearer token
-        ("Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8",
-         "Bearer ***w5N_XgL0"),
+        ("Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+         "Bearer ***sw5c"),
         # Short token
         ("abcd1234", "***1234"),
     ]
@@ -84,14 +84,14 @@ def test_custom_masking_chars():
     test_data = {
         "email": "user@example.com",
         "password": "secret123",
-        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8"
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
     }
     
     masked = mask_pii(test_data, config)
     assert masked["email"] == "us###@example.com"
     assert masked["password"] == "[MASKED]"
-    assert masked["token"].endswith("w5N_XgL0")
-    assert "$$$" in masked["token"]
+    assert masked["token"].startswith("$$$")
+    assert masked["token"].endswith("sw5c")
 
 def test_disable_masking():
     """Test disabling masking features"""
@@ -104,7 +104,7 @@ def test_disable_masking():
     test_data = {
         "email": "user@example.com",
         "password": "secret123",
-        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8"
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
     }
     
     masked = mask_pii(test_data, config)
@@ -120,7 +120,7 @@ def test_nested_objects():
             "email": "user@example.com",
             "settings": {
                 "password": "secret123",
-                "tokens": ["eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.abc123"]
+                "tokens": ["eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.K-4DMpfc_GZt3gU1sY1z_a4Q3d-4-r-4H4g1J8jSwGA"]
             }
         },
         "logs": [
@@ -132,7 +132,7 @@ def test_nested_objects():
     masked = mask_pii(test_data, config)
     assert masked["user"]["email"] == "us***@example.com"
     assert masked["user"]["settings"]["password"] == "[MASKED]"
-    assert masked["user"]["settings"]["tokens"][0].endswith("c123")
+    assert masked["user"]["settings"]["tokens"][0].endswith("SwGA")
     assert masked["logs"][0]["user_email"] == "us***@example.com"
     assert masked["logs"][1]["user_email"] == "us***@example.com"
 
@@ -142,7 +142,7 @@ def test_audit_log():
     test_data = {
         "email": "user@example.com",
         "password": "secret123",
-        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.abc123"
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.K-4DMpfc_GZt3gU1sY1z_a4Q3d-4-r-4H4g1J8jSwGA"
     }
     
     masked, audit = mask_pii(test_data, config, return_audit=True)
@@ -150,7 +150,7 @@ def test_audit_log():
     # Check masked data
     assert masked["email"] == "us***@example.com"
     assert masked["password"] == "[MASKED]"
-    assert masked["token"].endswith("c123")
+    assert masked["token"].endswith("SwGA")
     
     # Check audit log
     assert len(audit) == 3  # Three fields were masked

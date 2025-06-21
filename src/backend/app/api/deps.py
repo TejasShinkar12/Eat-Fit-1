@@ -14,7 +14,7 @@ from app.services.user_service import get_user_by_email
 settings = Settings()
 
 oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl=f"{settings.API_V1_STR}/login/access-token"
+    tokenUrl=f"{settings.API_V1_STR}/auth/login"
 )
 
 

@@ -22,6 +22,8 @@
     *   **User Authentication & Profile Setup:**
         *   **Status:** In Progress
         *   **Notes/Progress:** 
+            * ✅ **FIXED:** Resolved critical mismatch between SQLAlchemy `User` model and the Alembic database migration.
+            * ✅ The `User` model and Pydantic schemas now correctly reflect the database schema with fields like `height`, `weight`, `age`, `sex`, etc.
             * ✅ Database schema designed and implemented
             * ✅ PostgreSQL database created and configured
             * ✅ User model created with all required fields
@@ -37,12 +39,17 @@
             * Created PostgreSQL database and user
             * Set up SQLAlchemy with FastAPI
             * Implemented User model with fields:
-                * id (Integer, primary key)
-                * full_name (String)
-                * email (String, unique, indexed)
-                * hashed_password (String)
-                * is_active (Boolean)
-                * is_superuser (Boolean)
+                * `id` (UUID, primary key)
+                * `email` (String, unique, indexed)
+                * `hashed_password` (String)
+                * `height` (Float)
+                * `weight` (Float)
+                * `age` (Integer)
+                * `sex` (Enum)
+                * `activity_level` (Enum)
+                * `fitness_goal` (Enum)
+                * `created_at` (DateTime)
+                * `updated_at` (DateTime)
             * Set up Alembic migrations
             * Verified database structure and constraints
             * Implemented logging system with:
@@ -111,7 +118,9 @@
     * Database models: Basic tests
 *   **Integration Tests:** Planned for authentication endpoints
 *   **Manual Testing:** Not started
-*   **Known Issues/Bugs:** None reported
+*   **Known Issues/Bugs:** 
+    *   **RESOLVED:** `Critical: Password Hash Leakage`. The user API endpoints were exposing the `hashed_password`, creating a severe security vulnerability. This has been fixed by updating the `user_schema.User` Pydantic model to not include this field in API responses.
+    *   **RESOLVED:** `Critical: Database Model and Migration Mismatch`. The SQLAlchemy `User` model was out of sync with the database schema from the Alembic migration, which would have caused runtime `OperationalError` exceptions. This has been fixed by updating the model and schemas.
 *   **Testing Environment:** Local development setup
 
 ## 5. Risks and Issues
@@ -130,6 +139,14 @@
     *   **Impact:** [e.g., Delays in feature delivery, bugs]
     *   **Likelihood:** [e.g., Medium]
     *   **Mitigation:** [e.g., Clear API contracts, phased integration testing, dedicated integration lead]
+*   **Risk/Issue 4 (RESOLVED): Database Model and Migration Mismatch**
+    *   **Impact:** Runtime `OperationalError` exceptions from SQLAlchemy, preventing user data operations.
+    *   **Likelihood:** High (was occurring)
+    *   **Mitigation:** The `User` model (`app/models/user.py`) and corresponding Pydantic schemas (`app/schemas/user.py`) have been updated to be fully synchronized with the Alembic migration schema. The incorrect fields were removed and the correct fields (height, weight, UUID for id, etc.) were added.
+*   **Risk/Issue 5 (RESOLVED): Password Hash Leakage**
+    *   **Impact:** User password hashes were exposed via the API, allowing for potential offline brute-force attacks to discover user passwords.
+    *   **Likelihood:** High (was occurring)
+    *   **Mitigation:** The `user_schema.User` Pydantic model (`app/schemas/user.py`) has been corrected to inherit from `UserBase` instead of `UserInDBBase`, which prevents the `hashed_password` field from being included in the API response model.
 *   **Risk/Issue N: [Add more risks/issues as needed]**
     *   **Impact:**
     *   **Likelihood:**

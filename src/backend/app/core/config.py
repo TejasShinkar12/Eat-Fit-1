@@ -1,7 +1,7 @@
-from typing import List
+from typing import List, Union
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import PostgresDsn, field_validator, constr, Field, model_validator
-from pydantic.networks import AnyHttpUrl
+from pydantic import PostgresDsn, field_validator, constr, Field, model_validator, AnyHttpUrl
+
 
 class Settings(BaseSettings):
     # API Settings
@@ -11,15 +11,6 @@ class Settings(BaseSettings):
 
     # Database
     DATABASE_URL: PostgresDsn
-
-    @field_validator("DATABASE_URL")
-    @classmethod
-    def validate_database_url(cls, v: str) -> str:
-        if not str(v).endswith("/"):  # Ensure URL doesn't end with slash
-            parts = str(v).split("/")
-            if len(parts) < 4 or not parts[-1]:  # Check if database name is present
-                raise ValueError("Database URL must include a database name")
-        return v
 
     # Security
     JWT_SECRET_KEY: str
@@ -47,9 +38,20 @@ class Settings(BaseSettings):
         return v
 
     # CORS Settings
-    BACKEND_CORS_ORIGINS: List[str] = ["*"]
+    BACKEND_CORS_ORIGINS: List[str] = Field(default=['*'])
+
+    @field_validator("BACKEND_CORS_ORIGINS", mode="before")
+    @classmethod
+    def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
+        if isinstance(v, str) and not v.startswith("["):
+            return [i.strip() for i in v.split(",")]
+        elif isinstance(v, (list, str)):
+            return v
+        raise ValueError(v)
 
     model_config = SettingsConfigDict(
         case_sensitive=True,
         env_file=".env"
-    ) 
+    )
+
+settings = Settings() 

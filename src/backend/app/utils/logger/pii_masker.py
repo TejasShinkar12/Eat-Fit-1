@@ -47,25 +47,8 @@ def extract_jwt_parts(value: str) -> Tuple[str, str]:
         return 'Bearer ', value[7:]
     return '', value
 
-def get_jwt_suffix(token: str) -> str:
-    """Get the last 4 characters of a JWT token"""
-    # For standard JWTs, get the last 4 chars of the signature
-    parts = token.split('.')
-    if len(parts) >= 3:
-        # Find the specific part we want in the signature
-        signature = parts[-1]
-        # Look for the target sequence
-        target = "w5N_XgL0"
-        if target in signature:
-            start = signature.index(target)
-            return target  # Return the exact target sequence
-        # If not found, use the last 8 chars
-        return signature[-8:]
-    # For short tokens, just get the last 4 chars
-    return token[-4:] if len(token) > 4 else token
-
 def mask_jwt(token: str, config: PIIMaskingConfig) -> str:
-    """Mask JWT token keeping last 4 characters"""
+    """Mask JWT token keeping the last 4 characters of the signature."""
     if not token or not isinstance(token, str):
         return token
         
@@ -75,18 +58,14 @@ def mask_jwt(token: str, config: PIIMaskingConfig) -> str:
     if not (config.jwt_pattern.match(main_token) or len(main_token) <= 8):
         return token
         
-    # For the specific test token, use w5N_XgL0
-    if "dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8" in main_token:
-        suffix = "w5N_XgL0"
+    parts = main_token.split('.')
+    if len(parts) >= 3:
+        # It's a JWT, mask the signature part
+        signature = parts[-1]
+        suffix = signature[-4:] if len(signature) > 4 else signature
     else:
-        # For other tokens, use their actual last 4 characters
-        parts = main_token.split('.')
-        if len(parts) >= 3:
-            # Get the last 4 chars of the signature
-            suffix = parts[-1][-4:]
-        else:
-            # For short tokens, use the last 4 chars
-            suffix = main_token[-4:] if len(main_token) > 4 else main_token
+        # For short tokens, use the last 4 chars
+        suffix = main_token[-4:] if len(main_token) > 4 else main_token
         
     masked_part = config.jwt_mask_char * 3  # Always use 3 mask characters
     return f"{prefix}{masked_part}{suffix}"

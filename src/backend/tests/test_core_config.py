@@ -36,13 +36,13 @@ def test_settings_env_override(monkeypatch):
     assert settings.JWT_SECRET_KEY == "test-secret-key-2"
     assert str(settings.DATABASE_URL) == test_db_url
 
-def test_required_settings_missing():
+def test_required_settings_missing(monkeypatch):
     """Test that required settings raise error when missing"""
-    os.environ.pop("DATABASE_URL", None)
-    os.environ.pop("JWT_SECRET_KEY", None)
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    monkeypatch.delenv("JWT_SECRET_KEY", raising=False)
     
     with pytest.raises(ValidationError):
-        Settings()
+        Settings(_env_file=None)
 
 def test_invalid_settings_values():
     """Test that invalid values raise validation error"""

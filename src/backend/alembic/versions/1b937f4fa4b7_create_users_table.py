@@ -31,8 +31,8 @@ def upgrade() -> None:
     sa.Column('sex', sa.Enum('male', 'female', 'other', name='sex_enum'), nullable=True),
     sa.Column('activity_level', sa.Enum('sedentary', 'light', 'moderate', 'active', 'very_active', name='activity_level_enum'), nullable=True),
     sa.Column('fitness_goal', sa.Enum('lose', 'maintain', 'gain', name='fitness_goal_enum'), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_users_email'), 'users', ['email'], unique=True)
