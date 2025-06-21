@@ -37,13 +37,12 @@
             * Created PostgreSQL database and user
             * Set up SQLAlchemy with FastAPI
             * Implemented User model with fields:
-                * UUID primary key
-                * Email (unique, indexed)
-                * Hashed password
-                * Profile fields (height, weight, age, sex)
-                * Activity level enum
-                * Fitness goal enum
-                * Timestamps (created_at, updated_at)
+                * id (Integer, primary key)
+                * full_name (String)
+                * email (String, unique, indexed)
+                * hashed_password (String)
+                * is_active (Boolean)
+                * is_superuser (Boolean)
             * Set up Alembic migrations
             * Verified database structure and constraints
             * Implemented logging system with:
