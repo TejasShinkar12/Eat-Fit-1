@@ -21,10 +21,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const storedToken = await AsyncStorage.getItem('token');
         if (storedToken) {
           apiClient.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
-          setIsAuthenticated(true);
+          // Validate token by fetching user profile
+          try {
+            await apiClient.get('/users/me');
+            setIsAuthenticated(true);
+          } catch (err) {
+            // Token invalid/expired
+            await AsyncStorage.removeItem('token');
+            delete apiClient.defaults.headers.common['Authorization'];
+            setIsAuthenticated(false);
+          }
+        } else {
+          setIsAuthenticated(false);
         }
       } catch (e) {
-        console.error('Failed to load token', e);
+        setIsAuthenticated(false);
       }
       setIsLoading(false);
     };

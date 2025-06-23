@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
 import { TextInput, Button, Title } from 'react-native-paper';
-import * as api from '../api/auth';
 import { StackScreenProps } from '@react-navigation/stack';
 
-type RootStackParamList = {
+// Add ProfileSetupScreen to navigation types
+export type RootStackParamList = {
   Login: undefined;
   SignUp: undefined;
+  ProfileSetup: {
+    email: string;
+    password: string;
+    fullName: string;
+  };
 };
 
 type Props = StackScreenProps<RootStackParamList, 'SignUp'>;
@@ -17,20 +22,16 @@ const SignUpScreen = ({ navigation }: Props) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
 
-  const handleSignUp = async () => {
+  const handleContinue = () => {
     if (password !== confirmPassword) {
       Alert.alert("Passwords don't match");
       return;
     }
-    try {
-      await api.signup({ email, password, full_name: fullName });
-      Alert.alert('Success', 'Account created successfully! Please login.');
-      navigation.navigate('Login');
-    } catch (error) {
-      console.error('Signup failed', error);
-      const message = error.response?.data?.detail || 'An unexpected error occurred.';
-      Alert.alert('Signup Failed', message);
+    if (!email || !password || !fullName) {
+      Alert.alert('Please fill in all fields.');
+      return;
     }
+    navigation.navigate('ProfileSetup', { email, password, fullName });
   };
 
   return (
@@ -65,8 +66,8 @@ const SignUpScreen = ({ navigation }: Props) => {
         style={styles.input}
         secureTextEntry
       />
-      <Button mode="contained" onPress={handleSignUp} style={styles.button}>
-        Sign Up
+      <Button mode="contained" onPress={handleContinue} style={styles.button}>
+        Continue
       </Button>
       <Button onPress={() => navigation.navigate('Login')} style={styles.button}>
         Go to Login
