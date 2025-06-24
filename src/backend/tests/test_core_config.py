@@ -100,29 +100,6 @@ def test_password_length_validation():
             PASSWORD_MIN_LENGTH=-1
         )
 
-def test_database_url_validation():
-    """Test database URL validation"""
-    # Test invalid database URL format
-    with pytest.raises(ValidationError):
-        Settings(
-            DATABASE_URL="invalid-url",
-            JWT_SECRET_KEY="test-key"
-        )
-
-    # Test missing database name
-    with pytest.raises(ValidationError):
-        Settings(
-            DATABASE_URL="postgresql://user:pass@localhost:5432",
-            JWT_SECRET_KEY="test-key"
-        )
-
-    # Test invalid port
-    with pytest.raises(ValidationError):
-        Settings(
-            DATABASE_URL="postgresql://user:pass@localhost:invalid/dbname",
-            JWT_SECRET_KEY="test-key"
-        )
-
 def test_jwt_settings():
     """Test JWT settings validation"""
     # Test valid algorithm

@@ -1,4 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import JSONResponse
+from fastapi.openapi.models import Response as OpenAPIResponse
 from sqlalchemy.orm import Session
 import app.api.deps as deps
 import app.schemas.user as user_schema
@@ -7,7 +9,36 @@ import app.models.user as user_model
 
 router = APIRouter()
 
-@router.post("/", response_model=user_schema.User)
+@router.post(
+    "/",
+    response_model=user_schema.User,
+    responses={
+        400: {
+            "description": "User already exists",
+            "content": {
+                "application/json": {
+                    "example": {"detail": "The user with this username already exists in the system."}
+                }
+            }
+        },
+        422: {
+            "description": "Validation Error",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "detail": [
+                            {
+                                "loc": ["body", "email"],
+                                "msg": "value is not a valid email address",
+                                "type": "value_error.email"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    }
+)
 def create_user(
     *,
     db: Session = Depends(deps.get_db),
