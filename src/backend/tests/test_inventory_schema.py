@@ -2,7 +2,12 @@ import uuid
 import pytest
 from datetime import datetime, date, timedelta
 from pydantic import ValidationError
-from app.schemas.inventory import InventoryCreate, InventoryRead, InventoryUpdate, InventoryInDB
+from app.schemas.inventory import (
+    InventoryCreate,
+    InventoryRead,
+    InventoryUpdate,
+    InventoryInDB,
+)
 
 
 def test_inventory_create_valid():
@@ -16,7 +21,7 @@ def test_inventory_create_valid():
         "fats_g_per_serving": 2.0,
         "serving_size_unit": "g",
         "expiry_date": (date.today() + timedelta(days=10)).isoformat(),
-        "source": "manual"
+        "source": "manual",
     }
     schema = InventoryCreate(**data)
     assert schema.name == "Greek Yogurt"
@@ -41,7 +46,11 @@ def test_inventory_create_negative_quantity():
 
 def test_inventory_create_expiry_in_past():
     """Test expiry_date in the past raises ValidationError."""
-    data = {"name": "Test", "quantity": 1.0, "expiry_date": (date.today() - timedelta(days=1)).isoformat()}
+    data = {
+        "name": "Test",
+        "quantity": 1.0,
+        "expiry_date": (date.today() - timedelta(days=1)).isoformat(),
+    }
     with pytest.raises(ValidationError):
         InventoryCreate(**data)
 
@@ -77,4 +86,4 @@ def test_inventory_update_extra_fields():
     """Test InventoryUpdate ignores extra fields (Pydantic v2 default)."""
     schema = InventoryUpdate(quantity=5.0, extra_field=123)
     assert schema.quantity == 5.0
-    assert not hasattr(schema, "extra_field") 
+    assert not hasattr(schema, "extra_field")

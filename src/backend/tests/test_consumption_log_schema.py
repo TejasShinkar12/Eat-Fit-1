@@ -2,7 +2,12 @@ import uuid
 import pytest
 from datetime import datetime
 from pydantic import ValidationError
-from app.schemas.consumption_log import ConsumptionLogCreate, ConsumptionLogRead, ConsumptionLogUpdate
+from app.schemas.consumption_log import (
+    ConsumptionLogCreate,
+    ConsumptionLogRead,
+    ConsumptionLogUpdate,
+)
+
 
 def test_consumption_log_create_valid():
     """Test valid ConsumptionLogCreate serialization/deserialization."""
@@ -74,4 +79,4 @@ def test_consumption_log_update_extra_fields():
     """Test ConsumptionLogUpdate ignores extra fields (Pydantic v2 default)."""
     schema = ConsumptionLogUpdate(quantity_consumed=2.0, extra_field=123)
     assert schema.quantity_consumed == 2.0
-    assert not hasattr(schema, "extra_field") 
+    assert not hasattr(schema, "extra_field")

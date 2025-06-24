@@ -33,4 +33,10 @@ class Inventory(Base):
         DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
     )
 
-    owner = relationship("User", back_populates="inventory_items") 
+    owner = relationship("User", back_populates="inventory_items")
+    consumption_logs = relationship(
+        "ConsumptionLog",
+        back_populates="inventory_item",
+        lazy="select",
+        cascade="all, delete-orphan",
+    )

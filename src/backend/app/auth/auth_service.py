@@ -30,9 +30,7 @@ class JWTService:
         if expires_delta:
             expire = now + expires_delta
         else:
-            expire = now + timedelta(
-                minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
-            )
+            expire = now + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
         to_encode.update({"exp": int(expire.timestamp())})
         try:
             TokenPayload(**to_encode)
@@ -62,4 +60,4 @@ class JWTService:
             )
             return TokenPayload(**payload)
         except (JWTError, ValidationError):
-            return None 
+            return None

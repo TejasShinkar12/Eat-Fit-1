@@ -29,4 +29,6 @@ class ConsumptionLog(Base):
     consumed_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     user = relationship("User")
-    inventory_item = relationship("Inventory") 
+    inventory_item = relationship(
+        "Inventory", back_populates="consumption_logs", lazy="select"
+    )

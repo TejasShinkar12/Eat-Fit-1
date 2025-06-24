@@ -9,6 +9,7 @@ import app.models.user as user_model
 
 router = APIRouter()
 
+
 @router.post(
     "/",
     response_model=user_schema.User,
@@ -17,9 +18,11 @@ router = APIRouter()
             "description": "User already exists",
             "content": {
                 "application/json": {
-                    "example": {"detail": "The user with this username already exists in the system."}
+                    "example": {
+                        "detail": "The user with this username already exists in the system."
+                    }
                 }
-            }
+            },
         },
         422: {
             "description": "Validation Error",
@@ -30,14 +33,14 @@ router = APIRouter()
                             {
                                 "loc": ["body", "email"],
                                 "msg": "value is not a valid email address",
-                                "type": "value_error.email"
+                                "type": "value_error.email",
                             }
                         ]
                     }
                 }
-            }
-        }
-    }
+            },
+        },
+    },
 )
 def create_user(
     *,
@@ -58,4 +61,4 @@ def create_user(
 def read_users_me(
     current_user: user_model.User = Depends(deps.get_current_user),
 ):
-    return current_user 
+    return current_user

@@ -13,6 +13,7 @@ from app.auth.auth_service import JWTService
 
 router = APIRouter()
 
+
 @router.post(
     "/login",
     response_model=Token,
@@ -23,7 +24,7 @@ router = APIRouter()
                 "application/json": {
                     "example": {"detail": "Incorrect username or password"}
                 }
-            }
+            },
         },
         422: {
             "description": "Validation Error",
@@ -34,18 +35,17 @@ router = APIRouter()
                             {
                                 "loc": ["body", "username"],
                                 "msg": "field required",
-                                "type": "value_error.missing"
+                                "type": "value_error.missing",
                             }
                         ]
                     }
                 }
-            }
-        }
-    }
+            },
+        },
+    },
 )
 def login_for_access_token(
-    db: Session = Depends(deps.get_db),
-    form_data: OAuth2PasswordRequestForm = Depends()
+    db: Session = Depends(deps.get_db), form_data: OAuth2PasswordRequestForm = Depends()
 ):
     user = authenticate_user(db, email=form_data.username, password=form_data.password)
     if not user:
@@ -58,4 +58,4 @@ def login_for_access_token(
     access_token = JWTService.create_access_token(
         data={"sub": user.email}, expires_delta=access_token_expires
     )
-    return {"access_token": access_token, "token_type": "bearer"} 
+    return {"access_token": access_token, "token_type": "bearer"}

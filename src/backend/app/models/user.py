@@ -28,10 +28,14 @@ class User(Base):
     weight = Column(Float, nullable=True)
     age = Column(Integer, nullable=True)
     sex = Column(SAEnum(SexEnum, name="sex_enum"), nullable=True)
-    activity_level = Column(SAEnum(ActivityLevelEnum, name="activity_level_enum"), nullable=True)
-    fitness_goal = Column(SAEnum(FitnessGoalEnum, name="fitness_goal_enum"), nullable=True)
+    activity_level = Column(
+        SAEnum(ActivityLevelEnum, name="activity_level_enum"), nullable=True
+    )
+    fitness_goal = Column(
+        SAEnum(FitnessGoalEnum, name="fitness_goal_enum"), nullable=True
+    )
     created_at = Column(DateTime, nullable=False, server_default=func.now())
     updated_at = Column(
         DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
     )
-    inventory_items = relationship("Inventory", back_populates="owner") 
+    inventory_items = relationship("Inventory", back_populates="owner")

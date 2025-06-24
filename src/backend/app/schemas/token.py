@@ -4,26 +4,43 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class Token(BaseModel):
-    access_token: str = Field(..., description="JWT access token string", example="eyJhbGciOiJIUzI1NiIsInR5cCI6...")
-    token_type: str = Field(..., description="Type of the token", example="bearer")
+    access_token: str = Field(
+        ...,
+        description="JWT access token",
+        json_schema_extra={"example": "eyJhbGciOiJIUzI1NiIsInR5cCI6..."},
+    )
+    token_type: str = Field(
+        ..., description="Type of the token", json_schema_extra={"example": "bearer"}
+    )
     model_config = ConfigDict(
         json_schema_extra={
             "example": {
                 "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6...",
-                "token_type": "bearer"
+                "token_type": "bearer",
             }
         }
     )
 
 
 class TokenData(BaseModel):
-    username: str | None = Field(None, description="Username associated with the token", example="user@example.com")
+    username: str | None = Field(
+        None,
+        description="Username associated with the token",
+        json_schema_extra={"example": "johndoe"},
+    )
     model_config = ConfigDict(from_attributes=True)
 
 
 class TokenPayload(BaseModel):
-    sub: Optional[str] = Field(None, description="Subject (usually user identifier)", example="user@example.com")
-    exp: Optional[int] = Field(None, description="Expiration time as UNIX timestamp", example=1718000000)
+    sub: Optional[str] = Field(
+        None,
+        description="Subject (user identifier)",
+        json_schema_extra={"example": "user_id"},
+    )
+    exp: Optional[int] = Field(
+        None,
+        description="Expiration time (as UNIX timestamp)",
+        json_schema_extra={"example": 1712345678},
+    )
 
-    class Config:
-        extra = "allow" 
+    model_config = ConfigDict(extra="allow")

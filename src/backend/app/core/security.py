@@ -21,4 +21,4 @@ def get_password_hash(password: str) -> str:
     :param password: The plain-text password to hash.
     :return: The hashed password.
     """
-    return pwd_context.hash(password) 
+    return pwd_context.hash(password)

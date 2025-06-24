@@ -1,9 +1,11 @@
 from enum import Enum
 
+
 class SexEnum(str, Enum):
     male = "male"
     female = "female"
     other = "other"
+
 
 class ActivityLevelEnum(str, Enum):
     sedentary = "sedentary"
@@ -12,7 +14,8 @@ class ActivityLevelEnum(str, Enum):
     active = "active"
     very_active = "very_active"
 
+
 class FitnessGoalEnum(str, Enum):
     lose = "lose"
     maintain = "maintain"
-    gain = "gain" 
+    gain = "gain"
