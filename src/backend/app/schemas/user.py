@@ -3,26 +3,7 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from enum import Enum
-
-
-class SexEnum(str, Enum):
-    male = "male"
-    female = "female"
-    other = "other"
-
-
-class ActivityLevelEnum(str, Enum):
-    sedentary = "sedentary"
-    light = "light"
-    moderate = "moderate"
-    active = "active"
-    very_active = "very_active"
-
-
-class FitnessGoalEnum(str, Enum):
-    lose = "lose"
-    maintain = "maintain"
-    gain = "gain"
+from app.enums import SexEnum, ActivityLevelEnum, FitnessGoalEnum
 
 
 # Shared properties
