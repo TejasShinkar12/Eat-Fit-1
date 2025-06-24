@@ -10,6 +10,8 @@ from sqlalchemy import (
 )
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
+from sqlalchemy.orm import relationship
+from datetime import datetime
 
 from app.db import Base
 
@@ -40,5 +42,6 @@ class User(Base):
     )
     created_at = Column(DateTime, nullable=False, server_default=func.now())
     updated_at = Column(
-        DateTime, nullable=False, server_default=func.now(), onupdate=func.now()
-    ) 
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+    )
+    inventory_items = relationship("Inventory", back_populates="owner") 
