@@ -8,6 +8,7 @@ from app.schemas.inventory import (
     InventoryDetail,
 )
 from app.schemas.consumption_log import ConsumptionLogSummary
+import uuid
 
 router = APIRouter()
 
@@ -45,7 +46,7 @@ def list_inventory(
 def get_inventory_detail(
     *,
     db: Session = Depends(deps.get_db),
-    id: str,
+    id: uuid.UUID,
     include: str = Query(
         None,
         description="Comma-separated list of related data to include (e.g., 'consumption_logs')",
