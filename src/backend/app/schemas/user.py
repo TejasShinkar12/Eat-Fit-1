@@ -37,7 +37,7 @@ class UserBase(BaseModel):
     fitness_goal: Optional[FitnessGoalEnum] = Field(
         None,
         description="User's fitness goal",
-        json_schema_extra={"example": "weight_loss"},
+        json_schema_extra={"example": "lose"},
     )
 
 
@@ -104,7 +104,7 @@ class User(UserBase):
                 "age": 30,
                 "sex": "male",
                 "activity_level": "moderate",
-                "fitness_goal": "weight_loss",
+                "fitness_goal": "lose",
                 "created_at": "2024-06-01T12:00:00Z",
                 "updated_at": "2024-06-01T12:00:00Z",
             }

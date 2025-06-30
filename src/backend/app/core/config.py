@@ -12,7 +12,7 @@ from pydantic import (
 
 class Settings(BaseSettings):
     # API Settings
-    PROJECT_NAME: str = "PantryFit"
+    PROJECT_NAME: str = "FitEats"
     API_V1_STR: str = "/api/v1"
     DEBUG: bool = True
 

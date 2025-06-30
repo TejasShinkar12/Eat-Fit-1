@@ -1,4 +1,4 @@
-# PantryFit
+# FitEats
 
 A smart fitness and inventory management mobile application that helps users track their food inventory, monitor nutritional intake, and generate healthy recipes based on available ingredients.
 

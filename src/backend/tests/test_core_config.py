@@ -18,7 +18,7 @@ def setup_test_env():
 def test_settings_default_values():
     """Test that default values are set correctly"""
     settings = Settings()
-    assert settings.PROJECT_NAME == "PantryFit"
+    assert settings.PROJECT_NAME == "FitEats"
     assert settings.API_V1_STR == "/api/v1"
     assert settings.JWT_ALGORITHM == "HS256"
     assert settings.ACCESS_TOKEN_EXPIRE_MINUTES == 30
