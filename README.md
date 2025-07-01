@@ -93,7 +93,7 @@ uvicorn main:app --reload
 Create a `.env` file in the backend directory with the following variables:
 
 ```env
-DATABASE_URL=postgresql://user:password@localhost:5432/pantryfit
+DATABASE_URL=postgresql://user:password@localhost:5432/fiteats
 SECRET_KEY=your-secret-key
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30

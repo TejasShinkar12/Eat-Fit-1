@@ -1,11 +1,11 @@
-# Product Requirements Document: PantryFit MVP
+# Product Requirements Document: FitEats MVP
 
 **Version:** 1.0
 **Date:** May 25, 2025
 
 ## 1. Document Header
 
-**Product Name:** PantryFit (MVP)
+**Product Name:** FitEats (MVP)
 **Document Version:** 1.0
 **Date:** May 25, 2025
 **Author:** [Your Name/Team]
@@ -13,11 +13,11 @@
 
 ## 2. Executive Summary
 
-PantryFit is a mobile-first (or web) application designed to help users track their food inventory, monitor nutritional intake based on fitness goals, and generate healthy recipes using available ingredients. The core innovation lies in automating food inventory logging by processing images of users' pantries or fridges using computer vision and OCR. This MVP focuses on providing essential functionality: user authentication, image-based inventory ingestion, manual inventory management, automated calorie and macronutrient tracking, basic recipe generation, and simple reporting.
+FitEats is a mobile-first (or web) application designed to help users track their food inventory, monitor nutritional intake based on fitness goals, and generate healthy recipes using available ingredients. The core innovation lies in automating food inventory logging by processing images of users' pantries or fridges using computer vision and OCR. This MVP focuses on providing essential functionality: user authentication, image-based inventory ingestion, manual inventory management, automated calorie and macronutrient tracking, basic recipe generation, and simple reporting.
 
 ## 3. Product Vision
 
-The vision for PantryFit is to become the leading intelligent personal nutrition and inventory management companion. We aim to empower users to make healthier food choices, minimize food waste, and achieve their fitness goals by providing effortless tracking and personalized insights. By automating the tedious process of manual logging, PantryFit removes a significant barrier to consistent nutrition tracking. The long-term goal is to evolve into a comprehensive platform offering advanced meal planning, shopping list generation, community features, and deeper integration with health data, all powered by smart inventory management. Our target users are health-conscious individuals, busy families, and anyone looking to better manage their food resources and dietary habits.
+The vision for FitEats is to become the leading intelligent personal nutrition and inventory management companion. We aim to empower users to make healthier food choices, minimize food waste, and achieve their fitness goals by providing effortless tracking and personalized insights. By automating the tedious process of manual logging, FitEats removes a significant barrier to consistent nutrition tracking. The long-term goal is to evolve into a comprehensive platform offering advanced meal planning, shopping list generation, community features, and deeper integration with health data, all powered by smart inventory management. Our target users are health-conscious individuals, busy families, and anyone looking to better manage their food resources and dietary habits.
 
 ## 4. User Personas
 
