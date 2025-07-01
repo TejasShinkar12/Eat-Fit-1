@@ -17,20 +17,28 @@ class InventoryBase(BaseModel):
         description="Quantity of the item (number of servings)",
         json_schema_extra={"example": 2.0},
     )
-    calories_per_serving: Optional[float] = Field(
-        None, description="Calories per serving", json_schema_extra={"example": 120.0}
+    calories_per_serving: float = Field(
+        ...,
+        description="Calories per serving",
+        json_schema_extra={"example": 120.0},
     )
-    protein_g_per_serving: Optional[float] = Field(
-        None, description="Protein per serving (g)", json_schema_extra={"example": 10.0}
+    protein_g_per_serving: float = Field(
+        ...,
+        description="Protein per serving (g)",
+        json_schema_extra={"example": 10.0},
     )
-    carbs_g_per_serving: Optional[float] = Field(
-        None, description="Carbs per serving (g)", json_schema_extra={"example": 15.0}
+    carbs_g_per_serving: float = Field(
+        ...,
+        description="Carbs per serving (g)",
+        json_schema_extra={"example": 15.0},
     )
-    fats_g_per_serving: Optional[float] = Field(
-        None, description="Fats per serving (g)", json_schema_extra={"example": 2.0}
+    fats_g_per_serving: float = Field(
+        ...,
+        description="Fats per serving (g)",
+        json_schema_extra={"example": 2.0},
     )
-    serving_size_unit: Optional[str] = Field(
-        None,
+    serving_size_unit: str = Field(
+        ...,
         description="Unit for serving size (e.g., g, ml, piece)",
         json_schema_extra={"example": "g"},
     )
@@ -39,8 +47,8 @@ class InventoryBase(BaseModel):
         description="Expiry date (YYYY-MM-DD)",
         json_schema_extra={"example": "2024-12-31"},
     )
-    source: Optional[str] = Field(
-        None,
+    source: str = Field(
+        ...,
         description="Source of the item (e.g., manual, image)",
         json_schema_extra={"example": "manual"},
     )

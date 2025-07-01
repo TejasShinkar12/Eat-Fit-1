@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session, selectinload
 from sqlalchemy.exc import SQLAlchemyError
 from app.models import Inventory
-from app.schemas.inventory import InventoryCreate
+from app.schemas.inventory import InventoryCreate, InventoryUpdate
 from app.models.user import User
 import uuid
 
@@ -42,6 +42,34 @@ def create_inventory_item(db: Session, user: User, item_in: InventoryCreate):
             expiry_date=item_in.expiry_date,
             source=item_in.source or "manual",
         )
+        db.add(db_item)
+        db.commit()
+        db.refresh(db_item)
+        return db_item
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise e
+
+
+def update_inventory_item(
+    db: Session, user: User, id: uuid.UUID, item_in: InventoryUpdate
+):
+    try:
+        db_item = (
+            db.query(Inventory)
+            .filter(Inventory.id == id, Inventory.user_id == user.id)
+            .first()
+        )
+        if not db_item:
+            return None
+        # get only provided fields
+        update_data = item_in.model_dump(exclude_unset=True)
+        # prevent updating immutable fields
+        for field in ["id", "user_id", "added_at", "updated_at"]:
+            update_data.pop(field, None)
+        for field, value in update_data.items():
+            # update SQLAlchemy object
+            setattr(db_item, field, value)
         db.add(db_item)
         db.commit()
         db.refresh(db_item)
