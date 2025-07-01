@@ -150,3 +150,72 @@ def test_invalid_id(seed_inventory):
     assert resp.status_code == 404
     data = resp.json()
     assert data["detail"] == "Inventory item not found"
+
+
+def test_create_inventory_success(db, seed_inventory, auth_header_for_user):
+    test_user = db.query(User).first()
+    payload = {
+        "name": "Greek Yogurt",
+        "quantity": 2.0,
+        "calories_per_serving": 120.0,
+        "protein_g_per_serving": 10.0,
+        "carbs_g_per_serving": 15.0,
+        "fats_g_per_serving": 2.0,
+        "serving_size_unit": "g",
+        "expiry_date": (datetime.utcnow().date() + timedelta(days=10)).isoformat(),
+        "source": "manual"
+    }
+    headers = auth_header_for_user(test_user)
+    resp = client.post("/api/v1/inventory/inventory/create", json=payload, headers=headers)
+    assert resp.status_code == 201
+    data = resp.json()
+    assert data["name"] == payload["name"]
+    assert data["quantity"] == payload["quantity"]
+    assert data["expiry_date"] == payload["expiry_date"]
+    assert data["consumption_logs"] == []
+
+
+def test_create_inventory_missing_required(db, seed_inventory, auth_header_for_user):
+    test_user = db.query(User).first()
+    payload = {"quantity": 2.0}
+    headers = auth_header_for_user(test_user)
+    resp = client.post("/api/v1/inventory/inventory/create", json=payload, headers=headers)
+    assert resp.status_code == 422
+
+
+def test_create_inventory_invalid_quantity(db, seed_inventory, auth_header_for_user):
+    test_user = db.query(User).first()
+    payload = {"name": "Greek Yogurt", "quantity": -5.0}
+    headers = auth_header_for_user(test_user)
+    resp = client.post("/api/v1/inventory/inventory/create", json=payload, headers=headers)
+    assert resp.status_code == 422
+
+
+def test_create_inventory_expiry_in_past(db, seed_inventory, auth_header_for_user):
+    test_user = db.query(User).first()
+    payload = {
+        "name": "Greek Yogurt",
+        "quantity": 2.0,
+        "expiry_date": (datetime.utcnow().date() - timedelta(days=1)).isoformat()
+    }
+    headers = auth_header_for_user(test_user)
+    resp = client.post("/api/v1/inventory/inventory/create", json=payload, headers=headers)
+    assert resp.status_code == 422
+
+
+def test_create_inventory_unauthorized():
+    payload = {"name": "Greek Yogurt", "quantity": 2.0}
+    resp = client.post("/api/v1/inventory/inventory/create", json=payload)
+    assert resp.status_code == 401
+
+
+def test_create_inventory_optional_fields(db, seed_inventory, auth_header_for_user):
+    test_user = db.query(User).first()
+    payload = {"name": "Apple", "quantity": 1.0}
+    headers = auth_header_for_user(test_user)
+    resp = client.post("/api/v1/inventory/inventory/create", json=payload, headers=headers)
+    assert resp.status_code == 201
+    data = resp.json()
+    assert data["name"] == "Apple"
+    assert data["quantity"] == 1.0
+    assert data.get("calories_per_serving") is None

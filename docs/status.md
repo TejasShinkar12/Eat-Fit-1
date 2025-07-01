@@ -1,4 +1,4 @@
-# Project Status Report: PantryFit MVP
+# Project Status Report: FitEats MVP
 
 ## 1. Document Header
 
@@ -9,7 +9,7 @@
 
 ## 2. Project Summary
 
-*   **Project Goal:** Deliver an MVP for PantryFit, an AI-powered inventory and nutrition tracker. The MVP aims to provide user authentication, profile setup, and inventory/consumption log retrieval as foundational features.
+*   **Project Goal:** Deliver an MVP for FitEats, an AI-powered inventory and nutrition tracker. The MVP aims to provide user authentication, profile setup, and inventory/consumption log retrieval as foundational features.
 *   **Key Technologies:** FastAPI, PostgreSQL, React/React Native, SQLAlchemy, Pydantic, Alembic.
 *   **Overall Status:** Early Progress – Authentication/profile flows complete; inventory/consumption log retrieval available on backend; all other features not started.
 
@@ -34,12 +34,13 @@
         - ML model integration (object detection, OCR) in progress.
 
 - **Inventory View & Manual Edits:**
-    - **Status:** In Progresss
+    - **Status:** In Progress
     - **Notes:**
-        - Inventory CRUD (add, edit, delete, mark as consumed) is not fully implemented (backend & frontend).
+        - **Inventory create (manual add) API is fully implemented and tested (backend).**
+        - Inventory CRUD (edit, delete, mark as consumed) is not fully implemented (backend & frontend).
         - Pydantic summary/detail schemas and paginated endpoints in place.
         - Validation and error handling implemented.
-        - Frontend screens for inventory list, add/edit, and detail  not complete.
+        - Frontend screens for inventory list, add/edit, and detail not complete.
 
 - **Fitness Profile-Based Calorie Tracking:**
     - **Status:** In Progress
@@ -101,7 +102,7 @@
 
 ## 6. Next Steps
 
-1. Implement inventory and consumption log CRUD endpoints (backend).
+1. **Implement inventory and consumption log CRUD endpoints (backend) beyond create.**
 2. Begin frontend development for inventory and calorie tracking UI.
 3. Plan and scaffold ML features (image ingestion, recipe generation).
 4. Expand test coverage as new features are added.
@@ -111,5 +112,6 @@
 ## 7. Notes
 
 - Only authentication/profile and inventory/consumption log retrieval (backend) are currently functional.
-- No ML, CRUD, reporting, or advanced features are implemented or scaffolded as of this report.
+- **Inventory create (manual add) API is now fully implemented and tested (backend).**
+- No ML, CRUD (beyond create), reporting, or advanced features are implemented or scaffolded as of this report.
 
