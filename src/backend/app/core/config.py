@@ -21,6 +21,7 @@ class Settings(BaseSettings):
 
     # Database
     DATABASE_URL: PostgresDsn
+    DATABASE_URL_TEST: PostgresDsn = None
 
     # Security
     JWT_SECRET_KEY: str

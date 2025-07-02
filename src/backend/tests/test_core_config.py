@@ -7,7 +7,7 @@ import os
 @pytest.fixture(autouse=True)
 def setup_test_env():
     """Setup test environment variables"""
-    os.environ["DATABASE_URL"] = "postgresql://test:test@localhost:5432/test_db"
+    os.environ["DATABASE_URL_TEST"] = "postgresql://test:test@localhost:5432/test_db"
     os.environ["JWT_SECRET_KEY"] = "test-secret-key"
     yield
     # Clean up

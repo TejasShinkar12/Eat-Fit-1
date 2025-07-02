@@ -89,6 +89,9 @@
     - **Inventory update (PATCH) and delete (DELETE) endpoints are now fully covered with comprehensive tests, including edge cases, validation, ownership, and cascade delete.**
 - **Manual Testing:**
     - In progress for implemented features.
+- **Test Environment Fix:**
+    - The test environment now uses `load_dotenv()` at the top of `conftest.py` to ensure all environment variables (including `DATABASE_URL_TEST`) are loaded before any database connections are made. This prevents accidental use or clearing of the main database during test runs.
+    - This change fixed the previous issue where running tests could clear main database data if environment variables were not loaded in time.
 - **Known Issues/Bugs:**
     - None; all previously reported issues resolved.
 

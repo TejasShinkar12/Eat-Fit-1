@@ -11,21 +11,7 @@ client = TestClient(app)
 
 
 @pytest.fixture(scope="function")
-def db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-@pytest.fixture(scope="function")
 def seed_inventory(db):
-    # Clear tables
-    db.query(ConsumptionLog).delete()
-    db.query(Inventory).delete()
-    db.query(User).delete()
-    db.commit()
     # Create a test user
     test_user = User(
         id=uuid.uuid4(),
@@ -127,9 +113,6 @@ def test_detail_endpoint_with_logs(seed_inventory_with_logs):
 
 
 def test_empty_results(db):
-    db.query(ConsumptionLog).delete()
-    db.query(Inventory).delete()
-    db.commit()
     resp = client.get("/api/v1/inventory/inventory")
     assert resp.status_code == 200
     data = resp.json()
@@ -309,7 +292,7 @@ def test_patch_inventory_success_full(db, seed_inventory, auth_header_for_user):
             assert data[k] == v
 
 
-def test_patch_inventory_not_found(db, auth_header_for_user):
+def test_patch_inventory_not_found(db, seed_inventory, auth_header_for_user):
     test_user = db.query(User).first()
     fake_id = uuid.uuid4()
     payload = {"quantity": 10.0}
