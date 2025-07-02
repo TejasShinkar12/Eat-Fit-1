@@ -187,3 +187,40 @@ def update_inventory_item(
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=500, detail="Database error: " + str(e))
+
+
+@router.delete(
+    "/inventory/{item_id}",
+    status_code=200,
+    responses={
+        200: {
+            "description": "Item deleted successfully",
+            "content": {
+                "application/json": {"example": {"detail": "Item deleted successfully"}}
+            },
+        },
+        404: {"description": "Inventory item not found"},
+        403: {"description": "Not authorized to delete this item"},
+    },
+)
+def delete_inventory_item(
+    *,
+    db: Session = Depends(deps.get_db),
+    user: User = Depends(deps.get_current_user),
+    item_id: uuid.UUID,
+):
+    """
+    Delete an inventory item. Only the owner can delete their items.
+    Returns the updated item, or 404/403 if not found/unauthorized.
+    """
+    try:
+        db_item = inventory_service.delete_inventory_item(db, user, item_id)
+        if not db_item:
+            # Could be not found or not owned by user
+            raise HTTPException(status_code=404, detail="Inventory item not found")
+        return {"detail": "Item deleted successfully"}
+    except HTTPException:
+        raise
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Database error: " + str(e))

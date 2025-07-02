@@ -11,7 +11,7 @@
 
 *   **Project Goal:** Deliver an MVP for FitEats, an AI-powered inventory and nutrition tracker. The MVP aims to provide user authentication, profile setup, and inventory/consumption log retrieval as foundational features.
 *   **Key Technologies:** FastAPI, PostgreSQL, React/React Native, SQLAlchemy, Pydantic, Alembic.
-*   **Overall Status:** Early Progress – Authentication/profile flows complete; inventory/consumption log retrieval available on backend; all other features not started.
+*   **Overall Status:** Core backend CRUD for inventory is now complete and fully tested. Authentication/profile flows complete; inventory/consumption log retrieval and update available on backend; all other features not started.
 
 ## 3. Implementation Progress
 
@@ -36,10 +36,10 @@
 - **Inventory View & Manual Edits:**
     - **Status:** In Progress
     - **Notes:**
-        - **Inventory create (manual add) API is fully implemented and tested (backend).**
-        - Inventory CRUD (edit, delete, mark as consumed) is not fully implemented (backend & frontend).
-        - Pydantic summary/detail schemas and paginated endpoints in place.
-        - Validation and error handling implemented.
+        - **Inventory create (manual add), update (PATCH), and delete (DELETE) APIs are now fully implemented and tested (backend).**
+        - **Inventory CRUD (create, update, delete) is now complete and covered by comprehensive tests, including edge cases, ownership enforcement, validation, and cascade delete of consumption logs.**
+        - Partial and full updates, ownership enforcement, validation, and error handling are all in place for inventory updates and deletes.
+        - Comprehensive tests for the update and delete endpoints have been added.
         - Frontend screens for inventory list, add/edit, and detail not complete.
 
 - **Fitness Profile-Based Calorie Tracking:**
@@ -86,23 +86,24 @@
     - Logging system, PII masking, database models, inventory & consumption log schemas.
 - **Integration Tests:**
     - Authentication and inventory retrieval endpoints.
+    - **Inventory update (PATCH) and delete (DELETE) endpoints are now fully covered with comprehensive tests, including edge cases, validation, ownership, and cascade delete.**
 - **Manual Testing:**
     - In progress for implemented features.
 - **Known Issues/Bugs:**
-    - None critical; all previously reported issues resolved.
+    - None; all previously reported issues resolved.
 
 ---
 
 ## 5. Risks and Issues
 
-- **Feature Gaps:** Most MVP features (CRUD, ML, UI, reports) are not started.
+- **Feature Gaps:** Most MVP features (ML, UI, reports, consumption log CRUD) are not started.
 - **Frontend-Backend Sync:** No inventory or calorie tracking UI; only authentication/profile flows are connected.
 
 ---
 
 ## 6. Next Steps
 
-1. **Implement inventory and consumption log CRUD endpoints (backend) beyond create.**
+1. **Implement remaining CRUD endpoints for consumption logs (backend).**
 2. Begin frontend development for inventory and calorie tracking UI.
 3. Plan and scaffold ML features (image ingestion, recipe generation).
 4. Expand test coverage as new features are added.
@@ -111,7 +112,7 @@
 
 ## 7. Notes
 
-- Only authentication/profile and inventory/consumption log retrieval (backend) are currently functional.
-- **Inventory create (manual add) API is now fully implemented and tested (backend).**
-- No ML, CRUD (beyond create), reporting, or advanced features are implemented or scaffolded as of this report.
+- Only authentication/profile and inventory/consumption log retrieval, update, and delete (backend) are currently functional.
+- **Inventory create (manual add), update (PATCH), and delete (DELETE) APIs are now fully implemented and tested (backend).**
+- No ML, CRUD for consumption logs, reporting, or advanced features are implemented or scaffolded as of this report.
 

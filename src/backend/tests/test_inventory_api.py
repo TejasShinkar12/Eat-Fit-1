@@ -440,3 +440,76 @@ def test_patch_inventory_updated_at_changes(db, seed_inventory, auth_header_for_
     # updated_at should be newer
     new_updated_at = datetime.fromisoformat(data["updated_at"])
     assert new_updated_at >= old_updated_at
+
+
+def test_delete_inventory_success(db, seed_inventory, auth_header_for_user):
+    """Owner can delete their own inventory item."""
+    test_user = db.query(User).first()
+    item = db.query(Inventory).filter(Inventory.user_id == test_user.id).first()
+    headers = auth_header_for_user(test_user)
+    resp = client.delete(f"/api/v1/inventory/inventory/{item.id}", headers=headers)
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["detail"] == "Item deleted successfully"
+    # Ensure item is actually deleted
+    assert db.query(Inventory).filter(Inventory.id == item.id).first() is None
+
+
+def test_delete_inventory_not_found(db, seed_inventory, auth_header_for_user):
+    """Deleting a non-existent item returns 404."""
+    test_user = db.query(User).first()
+    fake_id = uuid.uuid4()
+    headers = auth_header_for_user(test_user)
+    resp = client.delete(f"/api/v1/inventory/inventory/{fake_id}", headers=headers)
+    assert resp.status_code == 404
+    assert resp.json()["detail"] == "Inventory item not found"
+
+
+def test_delete_inventory_forbidden(db, seed_inventory):
+    """Non-owner cannot delete another user's item (should return 404 for security)."""
+    # Create a second user
+    user2 = User(
+        id=uuid.uuid4(),
+        email="otheruser@example.com",
+        hashed_password="fakehashedpassword",
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow(),
+    )
+    db.add(user2)
+    db.commit()
+    db.refresh(user2)
+    # Get an item owned by the first user
+    item = db.query(Inventory).first()
+    from app.auth.auth_service import JWTService
+
+    headers = {
+        "Authorization": f"Bearer {JWTService.create_access_token({'sub': user2.email})}"
+    }
+    resp = client.delete(f"/api/v1/inventory/inventory/{item.id}", headers=headers)
+    # Should return 404 for security (not revealing existence)
+    assert resp.status_code == 404
+
+
+def test_delete_inventory_unauthorized(db, seed_inventory):
+    """Deleting without authentication returns 401."""
+    item = db.query(Inventory).first()
+    resp = client.delete(f"/api/v1/inventory/inventory/{item.id}")
+    assert resp.status_code == 401
+
+
+def test_delete_inventory_cascade_consumption_logs(
+    db, seed_inventory_with_logs, auth_header_for_user
+):
+    """Deleting an inventory item also deletes its associated consumption logs."""
+    inv, logs = seed_inventory_with_logs
+    log_ids = [log.id for log in logs]
+    test_user = db.query(User).first()
+    headers = auth_header_for_user(test_user)
+    # Delete the inventory item
+    resp = client.delete(f"/api/v1/inventory/inventory/{inv.id}", headers=headers)
+    assert resp.status_code == 200
+    # Ensure all associated consumption logs are deleted
+    for log in logs:
+        assert (
+            db.query(ConsumptionLog).filter(ConsumptionLog.id == log.id).first() is None
+        )

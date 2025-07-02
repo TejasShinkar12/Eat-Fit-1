@@ -77,3 +77,19 @@ def update_inventory_item(
     except SQLAlchemyError as e:
         db.rollback()
         raise e
+
+
+def delete_inventory_item(db: Session, user: User, id: uuid.UUID):
+    try:
+        db_item = (
+            db.query(Inventory)
+            .filter(Inventory.id == id, Inventory.user_id == user.id)
+            .first()
+        )
+        if not db_item:
+            return None
+        db.delete(db_item)
+        db.commit()
+        return db_item
+    except SQLAlchemyError as e:
+        raise e
