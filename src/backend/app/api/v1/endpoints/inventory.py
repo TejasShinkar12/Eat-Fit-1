@@ -1,4 +1,13 @@
-from fastapi import APIRouter, Depends, Query, HTTPException, Body, status
+from fastapi import (
+    BackgroundTasks,
+    APIRouter,
+    Depends,
+    Query,
+    HTTPException,
+    Body,
+    UploadFile,
+    File,
+)
 from sqlalchemy.orm import Session, selectinload
 from app.api import deps
 from app.models import Inventory, ConsumptionLog
@@ -76,7 +85,7 @@ def get_inventory_detail(
 @router.post(
     "/inventory/create",
     response_model=InventoryDetail,
-    status_code=status.HTTP_201_CREATED,
+    status_code=201,
     responses={
         201: {
             "description": "Inventory item created successfully",
@@ -224,3 +233,49 @@ def delete_inventory_item(
     except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=500, detail="Database error: " + str(e))
+
+
+@router.post(
+    "/upload-image",
+    responses={
+        200: {
+            "description": "Image received, processing started",
+            "content": {
+                "application/json": {
+                    "example": {"detail": "Image received, processing started"}
+                }
+            },
+        },
+        400: {
+            "description": "Invalid file type",
+            "content": {
+                "application/json": {
+                    "example": {"detail": "Unsupported file type: text/plain"}
+                }
+            },
+        },
+        401: {
+            "description": "Unauthorized",
+            "content": {
+                "application/json": {"example": {"detail": "Not authenticated"}}
+            },
+        },
+    },
+)
+async def upload_inventory_image(
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user),
+):
+    try:
+        file_bytes = await file.read()
+        background_tasks.add_task(
+            inventory_service.process_inventory_image,
+            file_bytes,
+            file.filename,
+            file.content_type,
+            current_user,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return {"detail": "Image received, processing started"}

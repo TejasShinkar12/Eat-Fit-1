@@ -1,4 +1,5 @@
 from typing import List, Union
+from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import (
     PostgresDsn,
@@ -9,6 +10,7 @@ from pydantic import (
     AnyHttpUrl,
 )
 
+load_dotenv()
 
 class Settings(BaseSettings):
     # API Settings

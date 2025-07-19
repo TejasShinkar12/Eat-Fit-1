@@ -1,3 +1,7 @@
+import os
+import shutil
+from datetime import datetime, timezone
+from fastapi import UploadFile
 from sqlalchemy.orm import Session, selectinload
 from sqlalchemy.exc import SQLAlchemyError
 from app.models import Inventory
@@ -93,3 +97,33 @@ def delete_inventory_item(db: Session, user: User, id: uuid.UUID):
         return db_item
     except SQLAlchemyError as e:
         raise e
+
+
+def process_inventory_image(file_bytes: bytes, filename: str, content_type: str, user: User):
+    """
+    Process and save an uploaded inventory image for a user.
+    Only accepts image files. Stores them locally for now.
+    """
+    # TODO: Image should first go to object detection service before being stored in S3
+
+    # Acceptable image MIME types
+    allowed_types = {"image/jpeg", "image/png", "image/gif", "image/webp", "image/bmp"}
+    if content_type not in allowed_types:
+        raise ValueError(f"Unsupported file type: {content_type}")
+
+    # Directory to store images
+    upload_dir = os.path.join(os.getcwd(), "uploaded_images")
+    os.makedirs(upload_dir, exist_ok=True)
+
+    # Generate unique filename: userID_timestamp.ext
+    ext = os.path.splitext(filename)[1] or ".img"
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S%f")
+    unique_filename = f"{user.id}_{timestamp}{ext}"
+    file_path = os.path.join(upload_dir, unique_filename)
+
+    # Save file to disk
+    with open(file_path, "wb") as out_file:
+        out_file.write(file_bytes)
+
+    # Optionally, log or store the file path in the database for later retrieval
+    return file_path
