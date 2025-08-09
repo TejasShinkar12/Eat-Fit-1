@@ -17,3 +17,4 @@ transformers
 torch
 roboflow
 numpy
+ultralytics

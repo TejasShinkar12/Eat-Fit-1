@@ -12,6 +12,7 @@ from pydantic import (
 
 load_dotenv()
 
+
 class Settings(BaseSettings):
     # API Settings
     PROJECT_NAME: str = "FitEats"
@@ -56,6 +57,9 @@ class Settings(BaseSettings):
 
     # CORS Settings
     BACKEND_CORS_ORIGINS: List[str] = Field(default=["*"])
+
+    # ML Models
+    RECIPE_MODEL_PATH: str = "C:/Users/TEJAS/Eat-Fit-1/src/backend/ml_models/t5-recipe-generation"
 
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
     @classmethod
