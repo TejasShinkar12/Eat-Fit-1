@@ -7,7 +7,7 @@ if os.environ.get("DATABASE_URL_TEST"):
     os.environ["DATABASE_URL"] = os.environ["DATABASE_URL_TEST"]
 
 import pytest
-from app.db import engine, SessionLocal
+from app.db import engine, SessionLocal, Base
 from app.auth.auth_service import JWTService
 import sqlalchemy
 
@@ -19,6 +19,11 @@ def db():
         yield session
     finally:
         session.close()
+
+
+@pytest.fixture(scope="session", autouse=True)
+def create_all_tables():
+    Base.metadata.create_all(bind=engine)
 
 
 @pytest.fixture

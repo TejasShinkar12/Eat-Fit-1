@@ -99,10 +99,16 @@ def delete_inventory_item(db: Session, user: User, id: uuid.UUID):
         raise e
 
 
-def process_inventory_image(file_bytes: bytes, filename: str, content_type: str, user: User):
+def process_inventory_image(
+    file_bytes: bytes, filename: str, content_type: str, user: User
+):
     """
     Process and save an uploaded inventory image for a user.
     Only accepts image files. Stores them locally for now.
+
+    Validation steps:
+    - Extension and size are checked in the endpoint.
+    - Content-Type is checked here for defense in depth.
     """
     # TODO: Image should first go to object detection service before being stored in S3
 
