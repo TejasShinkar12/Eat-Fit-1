@@ -19,3 +19,10 @@ class FitnessGoalEnum(str, Enum):
     lose = "lose"
     maintain = "maintain"
     gain = "gain"
+
+
+class ImageUploadStatus(str, Enum):
+    pending = "pending"
+    processing = "processing"
+    complete = "complete"
+    failed = "failed"
