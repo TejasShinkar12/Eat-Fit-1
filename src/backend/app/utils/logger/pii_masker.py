@@ -154,9 +154,11 @@ def mask_pii(
             else:
                 # Otherwise process each item
                 masked_data[key] = [
-                    mask_pii(item, config)
-                    if isinstance(item, dict)
-                    else mask_value(item, config)
+                    (
+                        mask_pii(item, config)
+                        if isinstance(item, dict)
+                        else mask_value(item, config)
+                    )
                     for item in value
                 ]
             continue

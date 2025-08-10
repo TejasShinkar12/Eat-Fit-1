@@ -8,6 +8,7 @@ from app.schemas.generated_recipe import GeneratedRecipeRead
 
 router = APIRouter()
 
+
 @router.post("/generate-from-inventory", status_code=200)
 def generate_recipes_from_inventory(
     db: Session = Depends(deps.get_db),
@@ -19,6 +20,7 @@ def generate_recipes_from_inventory(
     recipe_service = RecipeService()
     recipe = recipe_service.generate_recipe_from_inventory(db, current_user.id)
     return recipe
+
 
 @router.get("/user-recipes", response_model=List[GeneratedRecipeRead])
 def get_user_recipes(

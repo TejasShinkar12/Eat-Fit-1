@@ -90,12 +90,12 @@ This section outlines the key RESTful API endpoints for the backend, built using
 
 ### 4. Recipe Generator
 
-*   **`POST /recipes/generate`**
-    *   **Description:** Generates a recipe based on current inventory and user goal.
+*   **`POST /recipes/generate-from-inventory`**
+    *   **Description:** Generates a recipe based on current inventory and user goal using GEMINI API.
     *   **Authentication:** Required
-    *   **Request:** Optional Request Body: `{ "items": ["item_id1", "item_id2", ...] }` (Uses current inventory if empty)
-    *   **Response:** `{ "ingredients": ["...", "..."], "instructions": ["...", "..."] }`
-    *   **Status Codes:** 200 OK, 400 Bad Request, 401 Unauthorized, 500 Internal Server Error (if LLM inference fails)
+    *   **Request:** None (uses current inventory)
+    *   **Response:** `{ "title": "...", "ingredients": ["...", "..."], "directions": "..." }`
+    *   **Status Codes:** 200 OK, 400 Bad Request, 401 Unauthorized, 500 Internal Server Error (if GEMINI API fails)
 
 ### 5. Reports & Alerts
 
@@ -175,12 +175,13 @@ CREATE TABLE consumption_log (
     consumed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Optional: recipes table
-CREATE TABLE recipes (
+-- generated_recipes table
+CREATE TABLE generated_recipes (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    ingredients_list TEXT, -- Store as text or potentially JSONB array
-    instructions TEXT,
+    title VARCHAR(255) NOT NULL,
+    ingredients JSONB NOT NULL, -- Store as JSON array
+    directions TEXT NOT NULL,
     generated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 ```
@@ -266,18 +267,18 @@ CREATE TABLE recipes (
     *   Return the TDEE, total consumed calories/macros, and the depletion log for the day.
 
 ### 3.5 Recipe Generator
-*   **Generate Recipe:**
+*   **Recipe Generation with GEMINI API:**
     *   Get user ID from JWT.
     *   Retrieve the user's current inventory items (or use specific items provided in the request). Filter out items with quantity 0 or expired if desired.
-    *   Format a prompt string for the Text2Text model. The prompt should include:
+    *   Get the user's fitness goal from their profile.
+    *   Format a structured prompt for the GEMINI API that includes:
         *   A clear instruction to generate a recipe.
         *   The list of available inventory items (e.g., "Using: chicken breast, broccoli, quinoa, olive oil").
         *   The user's fitness goal (gain/lose/maintain), framed as a constraint (e.g., "Generate a healthy recipe for someone trying to lose weight").
-        *   Request specific output format (e.g., "Output ingredients list first, then instructions. Keep instructions simple.").
-    *   Send the prompt to the Hugging Face Text2Text model API (e.g., Flan-T5).
-    *   Receive the text response from the model.
-    *   Parse the response into distinct "ingredients" and "instructions" sections (this parsing might require heuristics based on how the model formats output).
-    *   Return the parsed recipe data. *(Optional: Save the generated recipe in the `recipes` table)*.
+        *   Structured output format instructions using Pydantic schema for recipe title, ingredients list, and directions.
+    *   Send the prompt to the GEMINI API through LangChain with PydanticOutputParser for structured response parsing.
+    *   Receive and parse the structured response from the API into distinct "title", "ingredients" and "instructions" sections.
+    *   Save the generated recipe in the `generated_recipes` table.
 
 ### 3.6 Reports & Alerts
 *   **Weekly Nutrient Trend:**
@@ -326,8 +327,8 @@ CREATE TABLE recipes (
 
 *   **Database Indexing:** As mentioned in Data Models, add indexes on frequently queried columns (`user_id`, `email`, `consumed_at`, `expiry_date`) to speed up database reads.
 *   **Image Processing Offloading:** This is the most performance-critical part. Use background tasks (e.g., FastAPI's own `BackgroundTasks`, or a dedicated task queue like Celery with Redis/RabbitMQ) to handle image analysis asynchronously. The user gets an immediate response, and the inventory updates later.
-*   **Model Loading:** Load the Hugging Face models (Detectron2, TrOCR, Text2Text) into memory once when the application starts, rather than on every request, to reduce latency for model inference.
-*   **Hugging Face Inference:** Consider using optimized libraries or deploying models on a platform designed for inference (like Hugging Face Endpoints) if self-hosting on standard servers is too slow or costly for GPU requirements.
+*   **Model Loading:** For the GEMINI API, connection pooling and efficient prompt engineering help with performance.
+*   **Hugging Face Inference:** No longer needed for recipe generation as we're using GEMINI API.
 *   **Caching (Optional MVP):** Use Redis to cache results of frequent read queries, such as:
     *   A user's current inventory list.
     *   Today's calorie tracking summary.
@@ -725,157 +726,31 @@ async def get_daily_tracker(
 ```
 
 ```python
-# 6.5 Recipe Generation Prompt Formatting Example
-# Assume necessary imports for DB models and Hugging Face interaction
+# 6.5 Recipe Generation with GEMINI API and Structured Output Example
+# Assume necessary imports for DB models and LangChain integration
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any
-import requests # Example for making API call
+from app.services.recipe_service import RecipeService # Our new service with structured output
 
 # Placeholder DB session dependency (replace with actual)
 def get_db_session():
     # yield SessionLocal()
     pass # Replace with real session manager
 
-# Placeholder for Hugging Face API interaction
-def call_text2text_model(prompt: str) -> str:
-    """
-    Calls the Text2Text model (e.g., Flan-T5) with the given prompt.
-    Needs API key and endpoint configuration.
-    """
-    HF_API_URL = "YOUR_HF_INFERENCE_API_URL"
-    HF_API_TOKEN = "YOUR_HF_API_TOKEN" # Store securely!
-
-    headers = {"Authorization": f"Bearer {HF_API_TOKEN}"}
-    payload = {"inputs": prompt}
-
-    try:
-        response = requests.post(HF_API_URL, headers=headers, json=payload)
-        response.raise_for_status() # Raise an exception for bad status codes
-        result = response.json()
-        # The structure of the response depends on the specific model and API
-        # Often, it's a list of dicts with a 'generated_text' key
-        if result and isinstance(result, list) and result[0].get('generated_text'):
-             return result[0]['generated_text']
-        else:
-             print(f"Unexpected model response format: {result}")
-             raise ValueError("Unexpected model response format")
-
-    except requests.exceptions.RequestException as e:
-        print(f"Error calling HF API: {e}")
-        raise HTTPException(status_code=500, detail="Error generating recipe (API error)")
-    except Exception as e:
-         print(f"Error processing model response: {e}")
-         raise HTTPException(status_code=500, detail="Error processing recipe generation result")
-
-
 # Endpoint
-@app.post("/api/v1/recipes/generate")
+@app.post("/api/v1/recipes/generate-from-inventory")
 async def generate_recipe(
     current_user: UserInDB = Depends(get_current_user), # Authenticated user
     db: Session = Depends(get_db_session) # DB session
-) -> Dict[str, List[str]]: # Return ingredients and instructions as lists of strings
+) -> Dict[str, Any]: # Return ingredients and instructions as lists of strings
 
-    # 1. Get user's current inventory
-    # Filter out items with quantity <= 0 or expired, if desired
-    inventory_items = db.query(Inventory).filter(
-        Inventory.user_id == current_user.id,
-        Inventory.quantity > 0 # Only use items with quantity > 0
-        # Optional: add filter for expiry_date
-    ).all()
-
-    if not inventory_items:
-        raise HTTPException(status_code=400, detail="No items available in your inventory to generate a recipe.")
-
-    # Format item names for the prompt
-    item_names = [item.name for item in inventory_items]
-    inventory_list_str = ", ".join(item_names)
-
-    # Get user's fitness goal
-    fitness_goal = current_user.fitness_goal # 'gain', 'lose', 'maintain'
-
-    # 2. Construct the prompt for the LLM
-    prompt = f"""
-    Generate a healthy recipe using the following ingredients: {inventory_list_str}.
-    This recipe is for someone who is trying to {fitness_goal} weight.
-    Provide an ingredients list first, followed by step-by-step instructions.
-    Make the instructions simple and easy to follow.
-    """
-    # Example of a more structured prompt asking for specific format:
-    # prompt = f"""
-    # Generate a healthy recipe using: {inventory_list_str}.
-    # Goal: {fitness_goal} weight.
-    # Output Format:
-    # Ingredients:
-    # - [Ingredient 1]
-    # - [Ingredient 2]
-    # ...
-    # Instructions:
-    # 1. [Step 1]
-    # 2. [Step 2]
-    # ...
-    # """
-
-
-    # 3. Call the Text2Text model
-    generated_text = call_text2text_model(prompt)
-
-    # 4. Parse the model's response into ingredients and instructions
-    # This part is highly dependent on how the model formats its output.
-    # Simple heuristic example: split by lines, look for keywords/patterns.
-    ingredients = []
-    instructions = []
-    is_ingredients_section = False
-    is_instructions_section = False
-
-    # Example simple parsing (might need refinement based on model output)
-    lines = generated_text.strip().split('\n')
-    for line in lines:
-        line = line.strip()
-        if not line: continue # Skip empty lines
-
-        if line.lower().startswith("ingredients:"):
-            is_ingredients_section = True
-            is_instructions_section = False
-            continue
-        elif line.lower().startswith("instructions:"):
-            is_ingredients_section = False
-            is_instructions_section = True
-            continue
-
-        if is_ingredients_section:
-            # Remove leading markers like '-', '*'
-            ingredients.append(line.lstrip('-* '))
-        elif is_instructions_section:
-             # Remove leading numbers/markers
-             instructions.append(line.lstrip('0123456789. '))
-        # If no section header found yet, maybe add to instructions or ignore?
-        # Depends on expected output. Assuming structured output after headers.
-
-    # Basic check if parsing was successful
-    if not ingredients or not instructions:
-         print(f"Warning: Failed to parse recipe text:\n{generated_text}")
-         # Fallback: return raw text, or raise error, or try different parsing
-         # For MVP, maybe just return raw text in a single field?
-         # Let's return what we *could* parse, or empty lists if failed.
-         # A robust parser is needed here.
-
-    # Optional: Save recipe to DB
-    # new_recipe = Recipe(
-    #     user_id=current_user.id,
-    #     ingredients_list="\n".join(ingredients), # Save as text
-    #     instructions="\n".join(instructions) # Save as text
-    # )
-    # db.add(new_recipe)
-    # db.commit()
-    # db.refresh(new_recipe)
-    # print(f"Saved recipe {new_recipe.id}")
-
-
-    # 5. Return the parsed recipe
-    return {
-        "ingredients": ingredients,
-        "instructions": instructions
-    }
+    # Use our new service that integrates with GEMINI and uses structured output
+    recipe_service = RecipeService()
+    try:
+        recipe_data = recipe_service.generate_recipe_from_inventory(db, current_user.id)
+        return recipe_data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating recipe: {str(e)}")
 
 ```

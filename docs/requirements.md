@@ -223,7 +223,7 @@ This section details the core features of the MVP and their acceptance criteria.
     *   Access to user data (profile, inventory, consumption) must be restricted to the authenticated user.
     *   Input validation should be implemented to prevent common vulnerabilities (e.g., SQL injection).
 *   **Technical:**
-    *   Adherence to the specified tech stack: FastAPI (Backend API), PostgreSQL (Database), Hugging Face models (trocr, detectron2-based, flan-t5 or similar for LLM). Frontend using React (Web) or React Native (Mobile).
+    *   Adherence to the specified tech stack: FastAPI (Backend API), PostgreSQL (Database), Computer Vision models (trocr, detectron2-based) for image processing, GEMINI API via LangChain for recipe generation. Frontend using React (Web) or React Native (Mobile).
     *   The application must be deployable on standard cloud platforms (e.g., Render, Heroku, AWS, GCP).
     *   Codebase should be reasonably structured and commented for maintainability.
     *   API endpoints should be well-defined.

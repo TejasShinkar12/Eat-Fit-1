@@ -215,7 +215,7 @@ The vision for FitEats is to become the leading intelligent personal nutrition a
     *   ML/AI Models (Hugging Face):
         *   Object Detection: A fine-tuned Detectron2-based model (or similar capable HF model) for identifying packaged food items in images.
         *   OCR: TrOCR or a similar Transformer-based OCR model for extracting text from nutrition labels and expiry dates.
-        *   Text Generation: Flan-T5 or a similar Text2Text Transformer model for recipe generation.
+        *   Text Generation: GEMINI API via LangChain for recipe generation.
         *   Speech-to-Text: Whisper (Optional for MVP voice input).
     *   Data Processing: Python libraries (e.g., OpenCV, Pillow, PyTorch/TensorFlow, Transformers) for image processing and ML model inference.
     *   Authentication: Secure password hashing (e.g., bcrypt) and token-based authentication (e.g., JWT).

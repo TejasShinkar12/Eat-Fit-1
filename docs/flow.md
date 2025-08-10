@@ -19,7 +19,7 @@ The NutriTrack Inventory & Fitness application provides users with tools to trac
 2.  **FastAPI Backend:** Serves as the core application logic, handling API requests, user authentication, data processing, business logic (calorie calculations), and orchestrating interactions with the Database and ML Services.
 3.  **ML Services:**
     *   **Image Processing Service:** Hosts Hugging Face models (Detectron2-based for Object Detection, TroCR for OCR) to process uploaded images of food items and extract item names, quantities, and nutrition label data.
-    *   **Text Generation Service:** Hosts a Hugging Face model (e.g., Flan-T5) for generating recipes based on user inventory and fitness goals.
+    *   **Text Generation Service:** Hosts GEMINI API integration via LangChain for generating recipes based on user inventory and fitness goals.
 4.  **PostgreSQL Database:** Persistent storage for user profiles, inventory items, consumption logs, and generated recipes.
 5.  **Redis Cache (Optional MVP):** Can be used for caching frequently accessed data like user profiles or recent recipe prompts/results to improve performance.
 
@@ -116,8 +116,8 @@ graph TD
 
 1.  **User:** Navigates to Recipe Generator.
 2.  **Frontend:** Optionally displays current inventory (from a prior fetch or fetches fresh data). Sends request (`/generate_recipe`) to Backend, including the user's current inventory item names and their fitness goal (gain/lose/maintain).
-3.  **Backend (FastAPI):** Receives inventory list and goal. Formulates a prompt for the Text Generation ML Service: "Generate a healthy recipe using: [item1, item2, ...] for someone trying to [gain/lose/maintain] weight." Sends prompt to the ML Text Generation Service API.
-4.  **ML Text Generation Service:** Receives prompt. Uses the Text2Text model to generate a recipe (ingredients list, simple instructions) based on the provided constraints. Returns the recipe text.
+3.  **Backend (FastAPI):** Receives inventory list and goal. Formulates a prompt for the Text Generation service: "Generate a healthy recipe using: [item1, item2, ...] for someone trying to [gain/lose/maintain] weight." Sends prompt to the GEMINI API via LangChain.
+4.  **ML Text Generation Service:** Receives prompt. Uses the GEMINI model to generate a recipe (ingredients list, simple instructions) based on the provided constraints. Returns the recipe text.
 5.  **Backend (FastAPI):** Receives recipe text. Optionally stores it temporarily or permanently (e.g., in a `recipes` table with user_id, timestamp, used_items, generated_text). Returns the recipe text to the Frontend.
 6.  **Frontend:** Displays the generated recipe text.
 
@@ -220,7 +220,7 @@ Robust error handling is crucial for a smooth user experience and system maintai
     *   ML Service unreachable/error: Backend catches the error during the API call to the ML service, logs it, returns 500 or a specific 4xx error (e.g., 424 Failed Dependency) to the Frontend with a message like "Image processing service error."
     *   ML Service returns no items/data: Backend logs the result, returns 200 with an empty or clear message ("No food items detected in the image.") to the Frontend.
 *   **Database Operations:** Backend catches exceptions during database interactions (e.g., connection errors, unique constraint failures for users, invalid IDs), logs the error, and returns 500 or 404/400 depending on the cause.
-*   **Recipe Generation:** If the ML Text Generation Service returns an error or irrelevant output, the Backend should catch it, log it, and return an error message to the user ("Could not generate recipe, please try again.") or a fallback message.
+*   **Recipe Generation:** If the GEMINI API returns an error or irrelevant output, the Backend should catch it, log it, and return an error message to the user ("Could not generate recipe, please try again.") or a fallback message.
 
 ## 6. Security Flows
 

@@ -8,7 +8,7 @@ A smart fitness and inventory management mobile application that helps users tra
 - Image-based inventory ingestion using ML
 - Manual inventory management
 - Calorie and macronutrient tracking
-- Recipe generation based on available ingredients
+- Recipe generation based on available ingredients (using GEMINI API)
 - Weekly reports and alerts
 - Basic text Q&A functionality
 
@@ -19,7 +19,7 @@ A smart fitness and inventory management mobile application that helps users tra
 - **Database**: PostgreSQL
 - **ML Services**: 
   - Image Processing (Object Detection + OCR using Detectron2 & TrOCR)
-  - Recipe Generation (Flan-T5)
+  - Recipe Generation (GEMINI API via LangChain)
   - Text Q&A
 - **Authentication**: JWT-based with bcrypt password hashing
 

@@ -59,7 +59,12 @@ class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: List[str] = Field(default=["*"])
 
     # ML Models
-    RECIPE_MODEL_PATH: str = "C:/Users/TEJAS/Eat-Fit-1/src/backend/ml_models/t5-recipe-generation"
+    RECIPE_MODEL_PATH: str = (
+        "C:/Users/TEJAS/Eat-Fit-1/src/backend/ml_models/t5-recipe-generation"
+    )
+
+    # GEMINI API
+    GEMINI_API_KEY: str
 
     @field_validator("BACKEND_CORS_ORIGINS", mode="before")
     @classmethod
